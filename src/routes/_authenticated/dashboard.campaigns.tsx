@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard-chrome";
@@ -7,6 +7,8 @@ import {
   deleteCampaign, duplicateCampaign,
 } from "@/lib/campaigns.functions";
 import { listTemplates, upsertTemplate } from "@/lib/templates.functions";
+import { getMyAccountState } from "@/lib/signup.functions";
+
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -32,9 +34,13 @@ function CampaignsPage() {
   const [showForm, setShowForm] = useState(false);
   const [trackingId, setTrackingId] = useState<string | null>(null);
 
+  const { data: accountState } = useQuery({
+    queryKey: ["account-state"], queryFn: () => getMyAccountState(),
+  });
   const { data: campaigns = [], isLoading } = useQuery({
     queryKey: ["campaigns"], queryFn: () => listCampaigns(),
   });
+
   const { data: executions = [] } = useQuery({
     queryKey: ["executions"], queryFn: () => listExecutions({ data: {} }),
     enabled: tab === "history",
