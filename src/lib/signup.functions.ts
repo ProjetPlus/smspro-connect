@@ -120,11 +120,31 @@ export const submitSignupApplication = createServerFn({ method: "POST" })
         email_error: emailError,
         email_sent_at: emailSentAt,
       } as never);
+
+      // Accusé de réception client : dossier reçu + achat du pack requis.
+      await supabaseAdmin.from("notifications").insert({
+        audience: "user",
+        user_id: context.userId,
+        kind: "signup",
+        title: "Dossier de vérification reçu",
+        body: "Votre dossier a été transmis à l'administration. Veuillez acheter un pack pour faire valider votre demande.",
+        link: "/tarifs",
+        payload: {} as never,
+        signup_application_id: applicationId,
+      } as never);
+
+      try {
+        const { sendKycReceivedEmail } = await import("./emails.server");
+        await sendKycReceivedEmail(application.email);
+      } catch {
+        /* e-mail non bloquant */
+      }
     } catch {
       /* la notification ne doit jamais bloquer la soumission du dossier */
     }
 
     return { ok: true, application_id: applicationId };
+
   });
 
 
