@@ -256,7 +256,64 @@ export const reviewSignupApplication = createServerFn({ method: "POST" })
           } as never);
         }
       }
+
+      if (app?.user_id) {
+        // Le compte devient actif : le nom d'expéditeur est utilisable.
+        await supabaseAdmin.from("profiles").update({ account_status: "active" }).eq("id", app.user_id);
+
+        if (!credited) {
+          await supabaseAdmin.from("notifications").insert({
+            audience: "user",
+            user_id: app.user_id,
+            kind: "account_approved",
+            title: "Votre compte est validé",
+            body: "Votre dossier est approuvé : votre nom d'expéditeur est actif et vous pouvez lancer vos campagnes.",
+            link: "/dashboard/campaigns",
+            payload: {} as never,
+          } as never);
+        }
+
+        if (app.email) {
+          try {
+            const { sendAccountApprovedEmail } = await import("./emails.server");
+            await sendAccountApprovedEmail(app.email);
+          } catch {
+            /* e-mail non bloquant */
+          }
+        }
+      }
     }
+
+    if (data.status === "rejected") {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: app } = await supabaseAdmin
+        .from("signup_applications")
+        .select("user_id, email")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (app?.user_id) {
+        await supabaseAdmin.from("profiles").update({ account_status: "rejected" }).eq("id", app.user_id);
+        await supabaseAdmin.from("notifications").insert({
+          audience: "user",
+          user_id: app.user_id,
+          kind: "account_rejected",
+          title: "Votre dossier nécessite une correction",
+          body: data.admin_notes || "Votre dossier n'a pas pu être validé. Corrigez-le et soumettez-le à nouveau.",
+          link: "/verification",
+          payload: {} as never,
+        } as never);
+      }
+      if (app?.email) {
+        try {
+          const { sendAccountRejectedEmail } = await import("./emails.server");
+          await sendAccountRejectedEmail(app.email, data.admin_notes ?? null);
+        } catch {
+          /* e-mail non bloquant */
+        }
+      }
+    }
+
+
 
     return { ok: true, credited };
   });
