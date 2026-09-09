@@ -1,0 +1,1 @@
+DELETE FROM public.user_roles WHERE user_id IN (SELECT id FROM auth.users WHERE email LIKE 'sim17856%@smsmobilepro.com') AND role = 'admin';

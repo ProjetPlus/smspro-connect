@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://smsmobilepro.lovable.app/sitemap.xml
