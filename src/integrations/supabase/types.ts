@@ -562,6 +562,42 @@ export type Database = {
         }
         Relationships: []
       }
+      phone_verifications: {
+        Row: {
+          attempts: number
+          channel: string
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          phone: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          channel?: string
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          phone: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pricing_tiers: {
         Row: {
           active: boolean
@@ -600,40 +636,58 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: string
+          city: string | null
           company: string | null
+          country: string | null
           created_at: string
+          dial_code: string | null
           email: string
           full_name: string | null
           gdpr_consent_at: string | null
           id: string
           marketing_consent: boolean
           phone: string | null
+          phone_e164: string | null
+          phone_verified_at: string | null
           sms_credits: number
           updated_at: string
           username: string | null
         }
         Insert: {
+          account_status?: string
+          city?: string | null
           company?: string | null
+          country?: string | null
           created_at?: string
+          dial_code?: string | null
           email: string
           full_name?: string | null
           gdpr_consent_at?: string | null
           id: string
           marketing_consent?: boolean
           phone?: string | null
+          phone_e164?: string | null
+          phone_verified_at?: string | null
           sms_credits?: number
           updated_at?: string
           username?: string | null
         }
         Update: {
+          account_status?: string
+          city?: string | null
           company?: string | null
+          country?: string | null
           created_at?: string
+          dial_code?: string | null
           email?: string
           full_name?: string | null
           gdpr_consent_at?: string | null
           id?: string
           marketing_consent?: boolean
           phone?: string | null
+          phone_e164?: string | null
+          phone_verified_at?: string | null
           sms_credits?: number
           updated_at?: string
           username?: string | null
@@ -665,6 +719,8 @@ export type Database = {
           last_name: string
           mobile: string
           package_slug: string | null
+          paid_at: string | null
+          payment_order_id: string | null
           representative: Json
           reviewed_at: string | null
           reviewed_by: string | null
@@ -701,6 +757,8 @@ export type Database = {
           last_name: string
           mobile: string
           package_slug?: string | null
+          paid_at?: string | null
+          payment_order_id?: string | null
           representative?: Json
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -737,6 +795,8 @@ export type Database = {
           last_name?: string
           mobile?: string
           package_slug?: string | null
+          paid_at?: string | null
+          payment_order_id?: string | null
           representative?: Json
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -749,7 +809,15 @@ export type Database = {
           user_id?: string | null
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "signup_applications_payment_order_id_fkey"
+            columns: ["payment_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sms_delivery_attempts: {
         Row: {
