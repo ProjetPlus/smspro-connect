@@ -294,25 +294,18 @@ export const sendCampaign = createServerFn({ method: "POST" })
     if (error || !camp) throw new Error("Campagne introuvable");
     if (camp.status === "sending") throw new Error("Envoi déjà en cours");
 
-    // Aucun envoi tant que le dossier de vérification n'est pas approuvé par l'administration.
-    const { data: application } = await context.supabase
-      .from("signup_applications")
-      .select("status, paid_at")
-      .eq("user_id", context.userId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (application?.['status'] !== "approved") {
-      throw new Error(
-        !application
-          ? "Complétez votre dossier de vérification avant d'envoyer des SMS."
-          : application['paid_at']
-            ? "Votre compte est en cours de validation par l'administration."
-            : "Achetez un pack pour faire valider votre demande avant d'envoyer des SMS.",
-      );
+    // Aucun envoi tant que le dossier n'est pas approuvé, et uniquement avec le
+    // nom d'expéditeur approuvé par l'administration (anti-usurpation).
+    const approvedSender = await getApprovedSenderId(context);
+    if ((camp.sender_id ?? "").trim() !== approvedSender) {
+      const { error: fixError } = await context.supabase
+        .from("campaigns")
+        .update({ sender_id: approvedSender })
+        .eq("id", camp.id)
+        .eq("user_id", context.userId);
+      if (fixError) throw new Error(fixError.message);
+      camp.sender_id = approvedSender;
     }
-
-
 
     const { data: profile } = await context.supabase
       .from("profiles").select("sms_credits").eq("id", context.userId).maybeSingle();
