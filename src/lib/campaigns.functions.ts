@@ -155,6 +155,10 @@ export const sendTestSms = createServerFn({ method: "POST" })
     message: z.string().min(1).max(1000),
   }).parse(d))
   .handler(async ({ data, context }) => {
+    // Anti-usurpation : l'envoi test doit utiliser le sender approuvé (KYC validé).
+    const approvedSender = await getApprovedSenderId(context);
+    assertSenderAllowed(data.sender_id, approvedSender);
+
     const { data: remaining, error: reserveError } = await context.supabase.rpc("reserve_sms_credits", {
       _user_id: context.userId,
       _amount: data.recipients.length,
@@ -166,14 +170,14 @@ export const sendTestSms = createServerFn({ method: "POST" })
     const results: { phone: string; status: string; error?: string }[] = [];
     let failed = 0;
     for (const phone of data.recipients) {
-      const res = await sendSms({ to: phone, from: data.sender_id, message: data.message });
+      const res = await sendSms({ to: phone, from: approvedSender, message: data.message });
       if (res.status === "failed") failed += 1;
       results.push({ phone, status: res.status, ...(res.error ? { error: res.error } : {}) });
       await context.supabase.from("sms_messages").insert({
         user_id: context.userId,
         phone,
         message: data.message,
-        sender_id: data.sender_id,
+        sender_id: approvedSender,
         status: res.status === "failed" ? "failed" : "sent",
         error: res.error ?? null,
         sent_at: res.status === "failed" ? null : new Date().toISOString(),
@@ -205,10 +209,16 @@ export const upsertCampaign = createServerFn({ method: "POST" })
     const status = data.save_as_draft ? "draft" : data.recurrence ? "recurring" : data.scheduled_at ? "scheduled" : "draft";
     const next_run_at = data.scheduled_at ?? null;
 
+    // Anti-usurpation : si un sender est déjà approuvé, il s'impose ; sinon on
+    // enregistre le brouillon tel quel (l'envoi restera bloqué tant que le KYC
+    // n'est pas approuvé et que le sender ne correspond pas).
+    const approvedSender = await getApprovedSenderIdOrNull(context);
+    if (approvedSender) assertSenderAllowed(data.sender_id, approvedSender);
+
     const payload = {
       user_id: context.userId,
       name: data.name,
-      sender_id: data.sender_id,
+      sender_id: approvedSender ?? data.sender_id,
       message: data.message,
       recipients: data.recipients,
       status,
