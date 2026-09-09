@@ -37,7 +37,10 @@ export const Route = createFileRoute("/api/public/webhooks/fedapay")({
             _provider_payload: payload,
           });
           if (error) return new Response("Settlement failed", { status: 500 });
+          const { afterOrderPaid } = await import("@/lib/payment-settlement.server");
+          await afterOrderPaid(order.id);
           return Response.json({ ok: true, credited: credited ?? 0 });
+
         }
 
         if ((status === "declined" || status === "canceled" || status === "failed") && order.status !== "paid") {
