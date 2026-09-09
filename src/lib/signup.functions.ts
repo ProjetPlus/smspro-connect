@@ -40,9 +40,18 @@ export const submitSignupApplication = createServerFn({ method: "POST" })
     await validateKycDocuments(context.supabase, context.userId, data.documents);
     const { certified, gdpr_consent, ...application } = data;
     const now = new Date().toISOString();
+
+    // Une nouvelle soumission remplace un dossier non encore approuvé.
+    await context.supabase
+      .from("signup_applications")
+      .delete()
+      .eq("user_id", context.userId)
+      .neq("status", "approved");
+
     const { data: inserted, error } = await context.supabase
       .from("signup_applications")
       .insert({
+
         ...application,
         user_id: context.userId,
         status: "pending",
