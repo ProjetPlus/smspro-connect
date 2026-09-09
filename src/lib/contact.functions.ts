@@ -38,8 +38,14 @@ export const submitContact = createServerFn({ method: "POST" })
       throw new Error("Impossible d'enregistrer votre message. Réessayez.");
     }
 
-    // TODO Phase 2: envoyer notification email via Lovable Emails
-    // (nécessite la configuration d'un domaine email vérifié).
+    // Notification e-mail (infos@smspromobile.com + copie permanente).
+    try {
+      const { sendContactEmail } = await import("./emails.server");
+      const result = await sendContactEmail(data);
+      if (!result.sent) console.error("[contact] email not sent:", result.reason);
+    } catch (mailError) {
+      console.error("[contact] email failed:", mailError);
+    }
 
     return { ok: true as const };
   });
