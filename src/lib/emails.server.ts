@@ -211,7 +211,7 @@ export function sendAccountRejectedEmail(to: string, notes?: string | null) {
 
 export function sendAdminEmail(subject: string, body: string, replyTo?: string) {
   return sendEmail({
-    to: adminNotificationEmail(),
+    to: adminNotificationEmails(),
     subject,
     html: layout(subject, `<pre style="white-space:pre-wrap;font-family:inherit;margin:0">${escapeHtml(body)}</pre>`, {
       label: "Ouvrir l'administration",
