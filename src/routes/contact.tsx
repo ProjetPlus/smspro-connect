@@ -4,7 +4,9 @@ import { SiteLayout, PageHero } from "@/components/site-chrome";
 import { submitContact } from "@/lib/contact.functions";
 import { track } from "@/lib/analytics";
 
-const WHATSAPP_NUMBER = "2250700000000";
+const WHATSAPP_NUMBER = "2250707173707";
+const PHONE_DISPLAY = "+225 07 07 17 37 07";
+const CONTACT_EMAIL = "infos@smspromobile.com";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
