@@ -14,12 +14,8 @@ export function CookieConsentBanner() {
     }
   }, []);
 
-  const accept = () => {
-    saveConsent({ analytics: true, timestamp: Date.now() });
-    setVisible(false);
-  };
-  const decline = () => {
-    saveConsent({ analytics: false, timestamp: Date.now() });
+  const decide = (analytics: boolean) => {
+    saveConsent({ analytics, timestamp: Date.now() });
     setVisible(false);
   };
 
@@ -37,7 +33,7 @@ export function CookieConsentBanner() {
         </p>
         <p className="text-sm text-foreground/80 leading-relaxed">
           Nous utilisons des statistiques anonymes (sans cookies publicitaires) pour améliorer la
-          plateforme. Consultez notre{" "}
+          plateforme. Votre choix est mémorisé : cette fenêtre ne s'affichera plus. Consultez notre{" "}
           <Link to="/confidentialite" className="text-primary underline underline-offset-2">
             politique de confidentialité
           </Link>
@@ -45,13 +41,13 @@ export function CookieConsentBanner() {
         </p>
         <div className="mt-4 flex flex-col-reverse sm:flex-row gap-2">
           <button
-            onClick={decline}
+            onClick={() => decide(false)}
             className="flex-1 border border-border bg-background text-foreground px-3 py-2 rounded-sm text-sm font-semibold hover:bg-muted transition-colors"
           >
             Refuser
           </button>
           <button
-            onClick={accept}
+            onClick={() => decide(true)}
             className="flex-1 bg-primary text-primary-foreground px-3 py-2 rounded-sm text-sm font-semibold hover:bg-primary-dark transition-colors"
           >
             Accepter
