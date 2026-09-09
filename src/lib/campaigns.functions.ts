@@ -2,6 +2,56 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
+/* --------- SENDER ID (anti-usurpation) --------- */
+
+type SupabaseCtx = { supabase: any; userId: string };
+
+/**
+ * Retourne l'identifiant expéditeur approuvé par l'administration pour ce compte.
+ * Lève une erreur si le dossier KYC n'est pas approuvé.
+ */
+async function getApprovedSenderId(context: SupabaseCtx): Promise<string> {
+  const { data: application } = await context.supabase
+    .from("signup_applications")
+    .select("status, paid_at, sender_id")
+    .eq("user_id", context.userId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!application || application["status"] !== "approved") {
+    throw new Error(
+      !application
+        ? "Complétez votre dossier de vérification avant d'envoyer des SMS."
+        : application["paid_at"]
+          ? "Votre compte est en cours de validation par l'administration."
+          : "Achetez un pack pour faire valider votre demande avant d'envoyer des SMS.",
+    );
+  }
+
+  const approved = (application["sender_id"] ?? "").trim();
+  if (!approved) throw new Error("Aucun nom d'expéditeur approuvé n'est associé à votre compte.");
+  return approved;
+}
+
+/** Vérifie qu'un sender_id demandé correspond exactement au sender approuvé. */
+function assertSenderAllowed(requested: string, approved: string) {
+  if (requested.trim() !== approved) {
+    throw new Error(
+      `Nom d'expéditeur non autorisé. Seul « ${approved} », approuvé pour votre compte, peut être utilisé.`,
+    );
+  }
+}
+
+/** Sender approuvé, sans erreur (null si non approuvé) — pour la validation à l'enregistrement. */
+async function getApprovedSenderIdOrNull(context: SupabaseCtx): Promise<string | null> {
+  try {
+    return await getApprovedSenderId(context);
+  } catch {
+    return null;
+  }
+}
+
 /* --------- LIST --------- */
 
 export const listCampaigns = createServerFn({ method: "GET" })
