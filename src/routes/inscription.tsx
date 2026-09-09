@@ -157,19 +157,20 @@ function SignupPage() {
                   <Field label="Prénom *">
                     <input className={inp} value={f.first_name} onChange={(e) => set("first_name", e.target.value)} autoComplete="given-name" />
                   </Field>
-                  <Field label="E-mail *" full>
+                  <Field label="E-mail *">
                     <input type="email" className={inp} value={f.email} onChange={(e) => set("email", e.target.value)} autoComplete="email" />
                   </Field>
-                  <Field label="Mot de passe * (10 caractères minimum)" full>
+                  <Field label="Mot de passe * (10 caractères min.)">
                     <PasswordField className={inp} value={f.password} onChange={(e) => set("password", e.target.value)} autoComplete="new-password" />
                   </Field>
                   <Field label="Contact *" full>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-stretch">
                       <select
-                        className={`${inp} w-40 shrink-0`}
+                        className={`${inp.replace("w-full", "")} w-auto shrink-0 pr-8`}
                         value={f.dial_code}
                         onChange={(e) => set("dial_code", e.target.value)}
-                        aria-label="Indicatif pays"
+                        aria-label="Pays"
+                        title="Pays"
                       >
                         {CEDEAO_COUNTRIES.map((c) => (
                           <option key={c.iso} value={c.dial}>
@@ -178,7 +179,7 @@ function SignupPage() {
                         ))}
                       </select>
                       <input
-                        className={inp}
+                        className={`${inp} flex-1 min-w-0`}
                         value={f.phone}
                         onChange={(e) => set("phone", e.target.value)}
                         inputMode="tel"

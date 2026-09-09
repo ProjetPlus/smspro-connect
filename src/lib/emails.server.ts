@@ -10,8 +10,37 @@ const BREVO_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
 
 export type EmailResult = { sent: boolean; reason?: string };
 
+/** Copie systématique de toutes les alertes administrateur. */
+const ADMIN_ALWAYS_COPY = ["pmiagnet@gmail.com"];
+
+/** Boîte de réception du formulaire de contact (avec copie permanente). */
+export function contactInboxEmails(): string[] {
+  return dedupe(["infos@smspromobile.com", ...ADMIN_ALWAYS_COPY]);
+}
+
+function dedupe(list: string[]): string[] {
+  const seen = new Set<string>();
+  return list
+    .map((email) => email.trim())
+    .filter((email) => {
+      const key = email.toLowerCase();
+      if (!email || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+/** Tous les destinataires des notifications administrateur. */
+export function adminNotificationEmails(): string[] {
+  const configured = (process.env["ADMIN_NOTIFICATION_EMAIL"] ?? "admin@smspromobile.com")
+    .split(/[,;]/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return dedupe([...configured, ...ADMIN_ALWAYS_COPY]);
+}
+
 export function adminNotificationEmail(): string {
-  return process.env["ADMIN_NOTIFICATION_EMAIL"] ?? "admin@smspromobile.com";
+  return adminNotificationEmails().join(", ");
 }
 
 export function appUrl(): string {
@@ -182,7 +211,7 @@ export function sendAccountRejectedEmail(to: string, notes?: string | null) {
 
 export function sendAdminEmail(subject: string, body: string, replyTo?: string) {
   return sendEmail({
-    to: adminNotificationEmail(),
+    to: adminNotificationEmails(),
     subject,
     html: layout(subject, `<pre style="white-space:pre-wrap;font-family:inherit;margin:0">${escapeHtml(body)}</pre>`, {
       label: "Ouvrir l'administration",
@@ -190,5 +219,40 @@ export function sendAdminEmail(subject: string, body: string, replyTo?: string) 
     }),
     text: body,
     ...(replyTo ? { replyTo } : {}),
+  });
+}
+
+/** Message du formulaire de contact : boîte infos@ + copie permanente. */
+export function sendContactEmail(params: {
+  name: string;
+  company?: string | null;
+  email: string;
+  phone?: string | null;
+  subject: string;
+  message: string;
+}) {
+  const rows = [
+    ["Nom", params.name],
+    ["Entreprise", params.company ?? "—"],
+    ["E-mail", params.email],
+    ["Téléphone", params.phone ?? "—"],
+    ["Sujet", params.subject],
+  ]
+    .map(
+      ([label, value]) =>
+        `<tr><td style="padding:4px 12px 4px 0;color:#78716c">${escapeHtml(label!)}</td><td style="padding:4px 0"><strong>${escapeHtml(value!)}</strong></td></tr>`,
+    )
+    .join("");
+
+  return sendEmail({
+    to: contactInboxEmails(),
+    subject: `Nouveau message du site : ${params.subject}`,
+    html: layout(
+      "Nouveau message depuis le formulaire de contact",
+      `<table role="presentation" style="font-size:14px;margin-bottom:16px">${rows}</table>
+       <p style="white-space:pre-wrap;margin:0">${escapeHtml(params.message)}</p>`,
+    ),
+    text: `${params.name} <${params.email}>\n${params.subject}\n\n${params.message}`,
+    replyTo: params.email,
   });
 }

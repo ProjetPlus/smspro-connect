@@ -16,25 +16,54 @@ export const Route = createFileRoute("/")({
 
   head: () => ({
     meta: [
-      { title: "SMS Pro Mobile — Plateforme SMS Marketing en Côte d'Ivoire" },
+      { title: "SMS Mobile Pro — Plateforme SMS Pro Mobile en Côte d'Ivoire" },
       {
         name: "description",
         content:
-          "Envoyez SMS marketing, alertes et campagnes ciblées en Côte d'Ivoire. Paiement Mobile Money, API Gateway, 98% de livraison. Propulsé par NM Technologie.",
+          "SMS Mobile Pro : plateforme SMS pro mobile pour vos campagnes marketing, alertes et OTP en Côte d'Ivoire et CEDEAO. Mobile Money, API SMS, 98 % de livraison.",
       },
-      { property: "og:title", content: "SMS Pro Mobile — Plateforme SMS Marketing en Côte d'Ivoire" },
+      { name: "keywords", content: "SMS mobile pro, SMS pro mobile, SMS marketing Côte d'Ivoire, plateforme SMS CEDEAO, API SMS Abidjan" },
+      { property: "og:site_name", content: "SMS Mobile Pro" },
+      { property: "og:title", content: "SMS Mobile Pro — Plateforme SMS professionnelle en Côte d'Ivoire" },
       {
         property: "og:description",
         content:
-          "Campagnes SMS, SMS enrichi et API Gateway pour entreprises en Afrique de l'Ouest. Paiement Mobile Money.",
+          "Campagnes SMS marketing, alertes et API SMS pour entreprises en Côte d'Ivoire et Afrique de l'Ouest. Paiement Mobile Money, envoi en quelques minutes.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
-      { property: "og:image", content: "https://smspromobile.com/og-image.png" },
-      { name: "twitter:image", content: "https://smspromobile.com/og-image.png" },
-
+      { property: "og:locale", content: "fr_FR" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "SMS Mobile Pro — Plateforme SMS professionnelle" },
+      {
+        name: "twitter:description",
+        content: "SMS marketing, alertes et API SMS en Côte d'Ivoire et CEDEAO. Paiement Mobile Money.",
+      },
     ],
     links: [{ rel: "canonical", href: "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          name: "SMS Mobile Pro",
+          alternateName: "SMS Pro Mobile",
+          description:
+            "Plateforme SMS professionnelle : campagnes marketing, alertes et API SMS en Côte d'Ivoire et CEDEAO.",
+          telephone: "+225 07 07 17 37 07",
+          email: "infos@smspromobile.com",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Cocody Angré-Mahou",
+            addressLocality: "Abidjan",
+            addressCountry: "CI",
+          },
+          areaServed: "Afrique de l'Ouest",
+          hasMap: "https://maps.app.goo.gl/nc3Ga89JyDJVNZaV8",
+        }),
+      },
+    ],
   }),
 });
 
