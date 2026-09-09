@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard-chrome";
@@ -7,6 +7,8 @@ import {
   deleteCampaign, duplicateCampaign,
 } from "@/lib/campaigns.functions";
 import { listTemplates, upsertTemplate } from "@/lib/templates.functions";
+import { getMyAccountState } from "@/lib/signup.functions";
+
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -32,9 +34,13 @@ function CampaignsPage() {
   const [showForm, setShowForm] = useState(false);
   const [trackingId, setTrackingId] = useState<string | null>(null);
 
+  const { data: accountState } = useQuery({
+    queryKey: ["account-state"], queryFn: () => getMyAccountState(),
+  });
   const { data: campaigns = [], isLoading } = useQuery({
     queryKey: ["campaigns"], queryFn: () => listCampaigns(),
   });
+
   const { data: executions = [] } = useQuery({
     queryKey: ["executions"], queryFn: () => listExecutions({ data: {} }),
     enabled: tab === "history",
@@ -94,6 +100,29 @@ function CampaignsPage() {
 
   return (
     <DashboardLayout title="Campagnes SMS">
+      {!accountState?.can_send && (
+        <div className="mb-4 rounded-sm border border-primary/40 bg-primary/5 p-4 text-sm">
+          <p className="font-semibold">Compte en cours de validation</p>
+          <p className="mt-1 text-foreground/70">
+            {accountState?.kyc_status === "none"
+              ? "Complétez votre dossier de vérification pour activer votre nom d'expéditeur."
+              : accountState?.paid
+                ? "Votre dossier et votre paiement sont bien reçus. L'administration valide votre compte sous peu."
+                : "Votre dossier est reçu. Achetez un pack pour faire valider votre demande."}
+          </p>
+          <div className="mt-3 flex gap-2">
+            {accountState?.kyc_status === "none" ? (
+              <Link to="/verification" className="px-3 py-1.5 rounded-sm bg-primary text-primary-foreground text-xs font-semibold">
+                Compléter la vérification
+              </Link>
+            ) : !accountState?.paid ? (
+              <Link to="/tarifs" className="px-3 py-1.5 rounded-sm bg-primary text-primary-foreground text-xs font-semibold">
+                Choisir un pack
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      )}
       <div className="flex justify-between items-center mb-4 flex-wrap gap-3">
         <div className="flex gap-1 flex-wrap items-center text-xs">
           {TABS.map((t) => (
@@ -118,7 +147,10 @@ function CampaignsPage() {
 
       {showForm && (
         <CampaignForm
+
           initial={editing}
+          lockedSender={accountState?.can_send ? null : (accountState?.sender_id ?? "")}
+
           onDone={() => { setShowForm(false); setEditing(null); qc.invalidateQueries({ queryKey: ["campaigns"] }); }}
           onCancel={() => { setShowForm(false); setEditing(null); }}
         />
@@ -251,7 +283,7 @@ function ExecutionsTable({ rows }: { rows: any[] }) {
   );
 }
 
-function CampaignForm({ initial, onDone, onCancel }: { initial: any | null; onDone: () => void; onCancel: () => void }) {
+function CampaignForm({ initial, onDone, onCancel, lockedSender }: { initial: any | null; onDone: () => void; onCancel: () => void; lockedSender?: string | null }) {
   const [name, setName] = useState(initial?.name ?? "");
   const [sender, setSender] = useState(initial?.sender_id ?? "SMSPRO");
   const [message, setMessage] = useState(initial?.message ?? "");
@@ -309,7 +341,17 @@ function CampaignForm({ initial, onDone, onCancel }: { initial: any | null; onDo
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom de la campagne" className="px-3 py-2 border border-border rounded-sm text-sm sm:col-span-2" />
-        <input required value={sender} onChange={(e) => setSender(e.target.value)} maxLength={11} placeholder="Expéditeur (max 11 car.)" className="px-3 py-2 border border-border rounded-sm text-sm font-mono" />
+        <input
+          required
+          value={lockedSender != null ? (lockedSender || "En attente de validation") : sender}
+          onChange={(e) => setSender(e.target.value)}
+          disabled={lockedSender != null}
+          title={lockedSender != null ? "Votre nom d'expéditeur sera actif après validation de votre compte." : undefined}
+          maxLength={11}
+          placeholder="Expéditeur (max 11 car.)"
+          className="px-3 py-2 border border-border rounded-sm text-sm font-mono disabled:bg-muted disabled:text-foreground/40 disabled:cursor-not-allowed"
+        />
+
         <div className="text-xs text-foreground/50 self-center">Fuseau: Africa/Abidjan · {smsCount} SMS × destinataires</div>
         <div className="sm:col-span-2 flex flex-wrap items-center gap-2">
           <select

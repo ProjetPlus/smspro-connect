@@ -10,7 +10,9 @@ type NavItem = { to: string; label: string; admin?: boolean };
 
 const NAV: NavItem[] = [
   { to: "/dashboard", label: "Vue d'ensemble" },
+  { to: "/verification", label: "Vérification (KYC)" },
   { to: "/dashboard/campaigns", label: "Campagnes" },
+
   { to: "/dashboard/orders", label: "Commandes" },
   { to: "/dashboard/api-keys", label: "Clés API" },
   { to: "/dashboard/settings", label: "Paramètres" },

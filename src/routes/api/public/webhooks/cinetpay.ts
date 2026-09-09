@@ -61,7 +61,10 @@ export const Route = createFileRoute("/api/public/webhooks/cinetpay")({
             _provider_payload: verify,
           });
           if (error) return new Response("Settlement failed", { status: 500 });
+          const { afterOrderPaid } = await import("@/lib/payment-settlement.server");
+          await afterOrderPaid(order.id);
           return Response.json({ ok: true, credited: credited ?? 0 });
+
         }
 
         if (status && status !== "PENDING" && order.status !== "paid") {

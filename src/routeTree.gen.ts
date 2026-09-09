@@ -27,6 +27,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as Char126oauthInitiateRouteImport } from './routes/~oauth.initiate'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as ActualitesSlugRouteImport } from './routes/actualites.$slug'
+import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ActualitesTagSlugRouteImport } from './routes/actualites.tag.$slug'
@@ -145,6 +146,12 @@ const ActualitesSlugRoute = ActualitesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ActualitesRoute,
 } as any)
+const AuthenticatedVerificationRoute =
+  AuthenticatedVerificationRouteImport.update({
+    id: '/verification',
+    path: '/verification',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/dashboard/',
@@ -321,6 +328,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions': typeof SolutionsRoute
   '/tarifs': typeof TarifsRoute
+  '/verification': typeof AuthenticatedVerificationRoute
   '/actualites/$slug': typeof ActualitesSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/~oauth/initiate': typeof Char126oauthInitiateRoute
@@ -368,6 +376,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions': typeof SolutionsRoute
   '/tarifs': typeof TarifsRoute
+  '/verification': typeof AuthenticatedVerificationRoute
   '/actualites/$slug': typeof ActualitesSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/~oauth/initiate': typeof Char126oauthInitiateRoute
@@ -417,6 +426,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/solutions': typeof SolutionsRoute
   '/tarifs': typeof TarifsRoute
+  '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/actualites/$slug': typeof ActualitesSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/~oauth/initiate': typeof Char126oauthInitiateRoute
@@ -466,6 +476,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/solutions'
     | '/tarifs'
+    | '/verification'
     | '/actualites/$slug'
     | '/auth/callback'
     | '/~oauth/initiate'
@@ -513,6 +524,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/solutions'
     | '/tarifs'
+    | '/verification'
     | '/actualites/$slug'
     | '/auth/callback'
     | '/~oauth/initiate'
@@ -561,6 +573,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/solutions'
     | '/tarifs'
+    | '/_authenticated/verification'
     | '/actualites/$slug'
     | '/auth/callback'
     | '/~oauth/initiate'
@@ -746,6 +759,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/actualites/$slug'
       preLoaderRoute: typeof ActualitesSlugRouteImport
       parentRoute: typeof ActualitesRoute
+    }
+    '/_authenticated/verification': {
+      id: '/_authenticated/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof AuthenticatedVerificationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
@@ -947,6 +967,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedAdminCampaignsRoute: typeof AuthenticatedAdminCampaignsRoute
   AuthenticatedAdminContactsRoute: typeof AuthenticatedAdminContactsRoute
   AuthenticatedAdminHeroRoute: typeof AuthenticatedAdminHeroRoute
@@ -970,6 +991,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedAdminCampaignsRoute: AuthenticatedAdminCampaignsRoute,
   AuthenticatedAdminContactsRoute: AuthenticatedAdminContactsRoute,
   AuthenticatedAdminHeroRoute: AuthenticatedAdminHeroRoute,

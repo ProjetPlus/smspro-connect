@@ -1,48 +1,19 @@
-const ADMIN_EMAIL = process.env["ADMIN_NOTIFICATION_EMAIL"] ?? "admin@smspromobile.com";
+import { adminNotificationEmail, sendAdminEmail as sendAdminBrevoEmail, type EmailResult } from "./emails.server";
 
-export type EmailResult = { sent: boolean; reason?: string };
+export type { EmailResult };
 
-/**
- * Envoie un email de notification admin.
- * Tant qu'aucune clé API email n'est configurée, l'envoi est ignoré (statut `skipped`).
- */
+/** Envoie un e-mail de notification à l'administrateur (via Brevo). */
 export async function sendAdminEmail(
   subject: string,
   body: string,
   replyTo?: string,
 ): Promise<EmailResult> {
-  const apiKey = process.env["RESEND_API_KEY"];
-  if (!apiKey) return { sent: false, reason: "RESEND_API_KEY non configurée" };
-
-  const from = process.env["EMAIL_FROM"] ?? "SMS Pro Mobile <noreply@smspromobile.com>";
-
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to: [ADMIN_EMAIL],
-      ...(replyTo ? { reply_to: replyTo } : {}),
-      subject,
-      text: body,
-    }),
-  });
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(`Email admin non envoyé (${response.status}) ${detail.slice(0, 200)}`.trim());
-  }
-  return { sent: true };
+  return sendAdminBrevoEmail(subject, body, replyTo);
 }
 
-export function adminNotificationEmail() {
-  return ADMIN_EMAIL;
-}
+export { adminNotificationEmail };
 
-/** Compat : ancien point d'entrée utilisé par le tunnel d'inscription. */
+/** Compat : point d'entrée utilisé par le tunnel de vérification. */
 export async function sendAdminSignupEmail(body: string, clientEmail: string): Promise<EmailResult> {
-  return sendAdminEmail("Nouveau dossier d'inscription à traiter", body, clientEmail);
+  return sendAdminEmail("Nouveau dossier de vérification à traiter", body, clientEmail);
 }

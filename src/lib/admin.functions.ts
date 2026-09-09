@@ -176,7 +176,10 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       });
 
       if (error) throw new Error(error.message);
+      const { afterOrderPaid } = await import("./payment-settlement.server");
+      await afterOrderPaid(data.id);
       return { ok: true, credited: credited ?? 0 };
+
     }
     const { error } = await supabaseAdmin.from("orders").update({ status: data.status }).eq("id", data.id);
     if (error) throw new Error(error.message);

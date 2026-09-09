@@ -40,9 +40,18 @@ export const submitSignupApplication = createServerFn({ method: "POST" })
     await validateKycDocuments(context.supabase, context.userId, data.documents);
     const { certified, gdpr_consent, ...application } = data;
     const now = new Date().toISOString();
+
+    // Une nouvelle soumission remplace un dossier non encore approuvé.
+    await context.supabase
+      .from("signup_applications")
+      .delete()
+      .eq("user_id", context.userId)
+      .neq("status", "approved");
+
     const { data: inserted, error } = await context.supabase
       .from("signup_applications")
       .insert({
+
         ...application,
         user_id: context.userId,
         status: "pending",
@@ -111,11 +120,31 @@ export const submitSignupApplication = createServerFn({ method: "POST" })
         email_error: emailError,
         email_sent_at: emailSentAt,
       } as never);
+
+      // Accusé de réception client : dossier reçu + achat du pack requis.
+      await supabaseAdmin.from("notifications").insert({
+        audience: "user",
+        user_id: context.userId,
+        kind: "signup",
+        title: "Dossier de vérification reçu",
+        body: "Votre dossier a été transmis à l'administration. Veuillez acheter un pack pour faire valider votre demande.",
+        link: "/tarifs",
+        payload: {} as never,
+        signup_application_id: applicationId,
+      } as never);
+
+      try {
+        const { sendKycReceivedEmail } = await import("./emails.server");
+        await sendKycReceivedEmail(application.email);
+      } catch {
+        /* e-mail non bloquant */
+      }
     } catch {
       /* la notification ne doit jamais bloquer la soumission du dossier */
     }
 
     return { ok: true, application_id: applicationId };
+
   });
 
 
@@ -227,7 +256,64 @@ export const reviewSignupApplication = createServerFn({ method: "POST" })
           } as never);
         }
       }
+
+      if (app?.user_id) {
+        // Le compte devient actif : le nom d'expéditeur est utilisable.
+        await supabaseAdmin.from("profiles").update({ account_status: "active" }).eq("id", app.user_id);
+
+        if (!credited) {
+          await supabaseAdmin.from("notifications").insert({
+            audience: "user",
+            user_id: app.user_id,
+            kind: "account_approved",
+            title: "Votre compte est validé",
+            body: "Votre dossier est approuvé : votre nom d'expéditeur est actif et vous pouvez lancer vos campagnes.",
+            link: "/dashboard/campaigns",
+            payload: {} as never,
+          } as never);
+        }
+
+        if (app.email) {
+          try {
+            const { sendAccountApprovedEmail } = await import("./emails.server");
+            await sendAccountApprovedEmail(app.email);
+          } catch {
+            /* e-mail non bloquant */
+          }
+        }
+      }
     }
+
+    if (data.status === "rejected") {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: app } = await supabaseAdmin
+        .from("signup_applications")
+        .select("user_id, email")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (app?.user_id) {
+        await supabaseAdmin.from("profiles").update({ account_status: "rejected" }).eq("id", app.user_id);
+        await supabaseAdmin.from("notifications").insert({
+          audience: "user",
+          user_id: app.user_id,
+          kind: "account_rejected",
+          title: "Votre dossier nécessite une correction",
+          body: data.admin_notes || "Votre dossier n'a pas pu être validé. Corrigez-le et soumettez-le à nouveau.",
+          link: "/verification",
+          payload: {} as never,
+        } as never);
+      }
+      if (app?.email) {
+        try {
+          const { sendAccountRejectedEmail } = await import("./emails.server");
+          await sendAccountRejectedEmail(app.email, data.admin_notes ?? null);
+        } catch {
+          /* e-mail non bloquant */
+        }
+      }
+    }
+
+
 
     return { ok: true, credited };
   });
@@ -240,4 +326,37 @@ export const deleteSignupApplication = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("signup_applications").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+/**
+ * État du compte du client connecté : vérification téléphone, dossier KYC,
+ * paiement d'un pack et nom d'expéditeur autorisé.
+ */
+export const getMyAccountState = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("account_status, phone_verified_at, sms_credits")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    const { data: app } = await context.supabase
+      .from("signup_applications")
+      .select("id, status, sender_id, paid_at, created_at")
+      .eq("user_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const kyc_status = (app?.['status'] as string | undefined) ?? "none";
+    return {
+      account_status: (profile?.['account_status'] as string | undefined) ?? "pending_verification",
+      phone_verified: Boolean(profile?.['phone_verified_at']),
+      sms_credits: (profile?.['sms_credits'] as number | undefined) ?? 0,
+      kyc_status,
+      paid: Boolean(app?.['paid_at']),
+      sender_id: (app?.['sender_id'] as string | null | undefined) ?? null,
+      can_send: kyc_status === "approved",
+    };
   });

@@ -95,6 +95,10 @@ function SignupsAdmin() {
                     <span className="text-[10px] font-mono uppercase px-2 py-1 border border-border rounded-sm">
                       {a['status']}
                     </span>
+                    <span className={`text-[10px] font-mono uppercase px-2 py-1 rounded-sm border ${a['paid_at'] ? "border-primary text-primary" : "border-border text-foreground/50"}`}>
+                      {a['paid_at'] ? `Pack payé ${new Date(a['paid_at']).toLocaleDateString("fr-FR")}` : "Pack non payé"}
+                    </span>
+
                     <button onClick={() => setOpenId(openId === a['id'] ? null : a['id'])}
                       className="text-xs px-3 py-1.5 border border-border rounded-sm hover:bg-muted">
                       Détails

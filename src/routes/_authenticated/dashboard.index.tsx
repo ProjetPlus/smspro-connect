@@ -4,6 +4,8 @@ import { DashboardLayout } from "@/components/dashboard-chrome";
 import { supabase } from "@/integrations/supabase/client";
 import { listCampaigns } from "@/lib/campaigns.functions";
 import { listOrders } from "@/lib/orders.functions";
+import { getMyAccountState } from "@/lib/signup.functions";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   component: DashboardHome,
@@ -22,13 +24,51 @@ function DashboardHome() {
   });
   const { data: campaigns = [] } = useQuery({ queryKey: ["campaigns"], queryFn: () => listCampaigns() });
   const { data: orders = [] } = useQuery({ queryKey: ["orders"], queryFn: () => listOrders() });
+  const { data: accountState } = useQuery({ queryKey: ["account-state"], queryFn: () => getMyAccountState() });
+
 
   const totalSent = campaigns.reduce((s, c) => s + (c.sent_count ?? 0), 0);
   const totalDelivered = campaigns.reduce((s, c) => s + (c.delivered_count ?? 0), 0);
 
+  const step =
+    accountState?.kyc_status === "approved"
+      ? null
+      : accountState?.kyc_status === "none"
+        ? {
+            title: "Étape 1 — Vérification de votre identité",
+            body: "Renseignez votre statut, votre structure, votre nom d'expéditeur et vos documents pour activer votre compte.",
+            cta: "Compléter la vérification",
+            to: "/verification" as const,
+          }
+        : !accountState?.paid
+          ? {
+              title: "Étape 2 — Achetez un pack",
+              body: "Votre dossier est reçu. Veuillez acheter un pack pour faire valider votre demande.",
+              cta: "Choisir un pack",
+              to: "/tarifs" as const,
+            }
+          : {
+              title: "Validation en cours",
+              body: "Votre dossier et votre paiement sont reçus. L'administration valide votre compte sous peu.",
+              cta: null,
+              to: null,
+            };
+
   return (
     <DashboardLayout title="Vue d'ensemble">
+      {step && (
+        <div className="mb-6 rounded-sm border border-primary/40 bg-primary/5 p-5">
+          <div className="font-display font-bold">{step.title}</div>
+          <p className="mt-1 text-sm text-foreground/70">{step.body}</p>
+          {step.to && (
+            <Link to={step.to} className="mt-3 inline-block rounded-sm bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground">
+              {step.cta}
+            </Link>
+          )}
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-3 mb-8">
+
         <Card label="Crédits SMS" value={String(profile?.sms_credits ?? 0)} accent />
         <Card label="SMS envoyés" value={String(totalSent)} />
         <Card label="SMS livrés" value={String(totalDelivered)} />
