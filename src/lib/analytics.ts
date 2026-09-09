@@ -12,22 +12,54 @@ export type ConsentState = {
   timestamp: number;
 };
 
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match?.[1] ? decodeURIComponent(match[1]) : null;
+}
+
+function writeCookie(name: string, value: string) {
+  if (typeof document === "undefined") return;
+  const oneYear = 60 * 60 * 24 * 365;
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${oneYear}; SameSite=Lax`;
+}
+
+/**
+ * Le choix est conservé à la fois en localStorage et dans un cookie propre :
+ * si l'un des deux stockages est indisponible (navigation privée, iframe,
+ * stockage partitionné), le consentement reste mémorisé et la bannière ne
+ * réapparaît pas à chaque rafraîchissement.
+ */
 export function readConsent(): ConsentState | null {
   if (typeof window === "undefined") return null;
+  const parse = (raw: string | null): ConsentState | null => {
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as ConsentState;
+    } catch {
+      return null;
+    }
+  };
   try {
-    const raw = localStorage.getItem(CONSENT_KEY);
-    return raw ? (JSON.parse(raw) as ConsentState) : null;
+    return parse(localStorage.getItem(CONSENT_KEY)) ?? parse(readCookie(CONSENT_KEY));
   } catch {
-    return null;
+    return parse(readCookie(CONSENT_KEY));
   }
 }
 
 export function saveConsent(state: ConsentState) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
+  const raw = JSON.stringify(state);
+  try {
+    localStorage.setItem(CONSENT_KEY, raw);
+  } catch {
+    /* stockage indisponible : le cookie prend le relais */
+  }
+  writeCookie(CONSENT_KEY, raw);
   window.dispatchEvent(new CustomEvent("consent-changed", { detail: state }));
   if (state.analytics) loadPlausible();
 }
+
 
 export function loadPlausible() {
   if (typeof window === "undefined") return;
