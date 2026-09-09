@@ -2,6 +2,56 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
+/* --------- SENDER ID (anti-usurpation) --------- */
+
+type SupabaseCtx = { supabase: any; userId: string };
+
+/**
+ * Retourne l'identifiant expéditeur approuvé par l'administration pour ce compte.
+ * Lève une erreur si le dossier KYC n'est pas approuvé.
+ */
+async function getApprovedSenderId(context: SupabaseCtx): Promise<string> {
+  const { data: application } = await context.supabase
+    .from("signup_applications")
+    .select("status, paid_at, sender_id")
+    .eq("user_id", context.userId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!application || application["status"] !== "approved") {
+    throw new Error(
+      !application
+        ? "Complétez votre dossier de vérification avant d'envoyer des SMS."
+        : application["paid_at"]
+          ? "Votre compte est en cours de validation par l'administration."
+          : "Achetez un pack pour faire valider votre demande avant d'envoyer des SMS.",
+    );
+  }
+
+  const approved = (application["sender_id"] ?? "").trim();
+  if (!approved) throw new Error("Aucun nom d'expéditeur approuvé n'est associé à votre compte.");
+  return approved;
+}
+
+/** Vérifie qu'un sender_id demandé correspond exactement au sender approuvé. */
+function assertSenderAllowed(requested: string, approved: string) {
+  if (requested.trim() !== approved) {
+    throw new Error(
+      `Nom d'expéditeur non autorisé. Seul « ${approved} », approuvé pour votre compte, peut être utilisé.`,
+    );
+  }
+}
+
+/** Sender approuvé, sans erreur (null si non approuvé) — pour la validation à l'enregistrement. */
+async function getApprovedSenderIdOrNull(context: SupabaseCtx): Promise<string | null> {
+  try {
+    return await getApprovedSenderId(context);
+  } catch {
+    return null;
+  }
+}
+
 /* --------- LIST --------- */
 
 export const listCampaigns = createServerFn({ method: "GET" })
@@ -105,6 +155,10 @@ export const sendTestSms = createServerFn({ method: "POST" })
     message: z.string().min(1).max(1000),
   }).parse(d))
   .handler(async ({ data, context }) => {
+    // Anti-usurpation : l'envoi test doit utiliser le sender approuvé (KYC validé).
+    const approvedSender = await getApprovedSenderId(context);
+    assertSenderAllowed(data.sender_id, approvedSender);
+
     const { data: remaining, error: reserveError } = await context.supabase.rpc("reserve_sms_credits", {
       _user_id: context.userId,
       _amount: data.recipients.length,
@@ -116,14 +170,14 @@ export const sendTestSms = createServerFn({ method: "POST" })
     const results: { phone: string; status: string; error?: string }[] = [];
     let failed = 0;
     for (const phone of data.recipients) {
-      const res = await sendSms({ to: phone, from: data.sender_id, message: data.message });
+      const res = await sendSms({ to: phone, from: approvedSender, message: data.message });
       if (res.status === "failed") failed += 1;
       results.push({ phone, status: res.status, ...(res.error ? { error: res.error } : {}) });
       await context.supabase.from("sms_messages").insert({
         user_id: context.userId,
         phone,
         message: data.message,
-        sender_id: data.sender_id,
+        sender_id: approvedSender,
         status: res.status === "failed" ? "failed" : "sent",
         error: res.error ?? null,
         sent_at: res.status === "failed" ? null : new Date().toISOString(),
@@ -155,10 +209,16 @@ export const upsertCampaign = createServerFn({ method: "POST" })
     const status = data.save_as_draft ? "draft" : data.recurrence ? "recurring" : data.scheduled_at ? "scheduled" : "draft";
     const next_run_at = data.scheduled_at ?? null;
 
+    // Anti-usurpation : si un sender est déjà approuvé, il s'impose ; sinon on
+    // enregistre le brouillon tel quel (l'envoi restera bloqué tant que le KYC
+    // n'est pas approuvé et que le sender ne correspond pas).
+    const approvedSender = await getApprovedSenderIdOrNull(context);
+    if (approvedSender) assertSenderAllowed(data.sender_id, approvedSender);
+
     const payload = {
       user_id: context.userId,
       name: data.name,
-      sender_id: data.sender_id,
+      sender_id: approvedSender ?? data.sender_id,
       message: data.message,
       recipients: data.recipients,
       status,
@@ -234,25 +294,18 @@ export const sendCampaign = createServerFn({ method: "POST" })
     if (error || !camp) throw new Error("Campagne introuvable");
     if (camp.status === "sending") throw new Error("Envoi déjà en cours");
 
-    // Aucun envoi tant que le dossier de vérification n'est pas approuvé par l'administration.
-    const { data: application } = await context.supabase
-      .from("signup_applications")
-      .select("status, paid_at")
-      .eq("user_id", context.userId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (application?.['status'] !== "approved") {
-      throw new Error(
-        !application
-          ? "Complétez votre dossier de vérification avant d'envoyer des SMS."
-          : application['paid_at']
-            ? "Votre compte est en cours de validation par l'administration."
-            : "Achetez un pack pour faire valider votre demande avant d'envoyer des SMS.",
-      );
+    // Aucun envoi tant que le dossier n'est pas approuvé, et uniquement avec le
+    // nom d'expéditeur approuvé par l'administration (anti-usurpation).
+    const approvedSender = await getApprovedSenderId(context);
+    if ((camp.sender_id ?? "").trim() !== approvedSender) {
+      const { error: fixError } = await context.supabase
+        .from("campaigns")
+        .update({ sender_id: approvedSender })
+        .eq("id", camp.id)
+        .eq("user_id", context.userId);
+      if (fixError) throw new Error(fixError.message);
+      camp.sender_id = approvedSender;
     }
-
-
 
     const { data: profile } = await context.supabase
       .from("profiles").select("sms_credits").eq("id", context.userId).maybeSingle();
