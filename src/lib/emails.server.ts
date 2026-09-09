@@ -10,8 +10,37 @@ const BREVO_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
 
 export type EmailResult = { sent: boolean; reason?: string };
 
+/** Copie systématique de toutes les alertes administrateur. */
+const ADMIN_ALWAYS_COPY = ["pmiagnet@gmail.com"];
+
+/** Boîte de réception du formulaire de contact (avec copie permanente). */
+export function contactInboxEmails(): string[] {
+  return dedupe(["infos@smspromobile.com", ...ADMIN_ALWAYS_COPY]);
+}
+
+function dedupe(list: string[]): string[] {
+  const seen = new Set<string>();
+  return list
+    .map((email) => email.trim())
+    .filter((email) => {
+      const key = email.toLowerCase();
+      if (!email || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+/** Tous les destinataires des notifications administrateur. */
+export function adminNotificationEmails(): string[] {
+  const configured = (process.env["ADMIN_NOTIFICATION_EMAIL"] ?? "admin@smspromobile.com")
+    .split(/[,;]/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return dedupe([...configured, ...ADMIN_ALWAYS_COPY]);
+}
+
 export function adminNotificationEmail(): string {
-  return process.env["ADMIN_NOTIFICATION_EMAIL"] ?? "admin@smspromobile.com";
+  return adminNotificationEmails().join(", ");
 }
 
 export function appUrl(): string {
