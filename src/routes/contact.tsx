@@ -100,7 +100,7 @@ function ContactPage() {
               <div className="text-[10px] font-mono uppercase tracking-widest text-primary mb-2">
                 WhatsApp
               </div>
-              <p className="font-display font-bold text-lg mb-3 break-all">+225 07 00 00 00 00</p>
+              <p className="font-display font-bold text-lg mb-3 break-all">{PHONE_DISPLAY}</p>
               <button
                 type="button"
                 onClick={onWhatsApp}
@@ -114,7 +114,9 @@ function ContactPage() {
               <div className="text-[10px] font-mono uppercase tracking-widest text-primary mb-2">
                 Téléphone
               </div>
-              <p className="font-display font-bold text-lg break-all">+225 07 00 00 00 00</p>
+              <p className="font-display font-bold text-lg break-all">
+                <a href={`tel:+2250707173707`}>{PHONE_DISPLAY}</a>
+              </p>
               <p className="text-xs text-foreground/60 mt-1">Lun-Ven, 8h-18h GMT</p>
             </div>
 
@@ -123,8 +125,16 @@ function ContactPage() {
                 Email
               </div>
               <p className="font-display font-bold text-base sm:text-lg break-all">
-                contact@smspromobile.ci
+                <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
               </p>
+            </div>
+
+            <div className="p-5 bg-muted rounded-sm">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-primary mb-2">
+                Adresse
+              </div>
+              <p className="font-display font-bold text-base sm:text-lg">Cocody Angré-Mahou</p>
+              <p className="text-xs text-foreground/60 mt-1">Abidjan, Côte d'Ivoire</p>
             </div>
           </div>
 
