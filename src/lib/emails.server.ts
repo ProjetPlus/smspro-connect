@@ -221,3 +221,38 @@ export function sendAdminEmail(subject: string, body: string, replyTo?: string) 
     ...(replyTo ? { replyTo } : {}),
   });
 }
+
+/** Message du formulaire de contact : boîte infos@ + copie permanente. */
+export function sendContactEmail(params: {
+  name: string;
+  company?: string | null;
+  email: string;
+  phone?: string | null;
+  subject: string;
+  message: string;
+}) {
+  const rows = [
+    ["Nom", params.name],
+    ["Entreprise", params.company ?? "—"],
+    ["E-mail", params.email],
+    ["Téléphone", params.phone ?? "—"],
+    ["Sujet", params.subject],
+  ]
+    .map(
+      ([label, value]) =>
+        `<tr><td style="padding:4px 12px 4px 0;color:#78716c">${escapeHtml(label!)}</td><td style="padding:4px 0"><strong>${escapeHtml(value!)}</strong></td></tr>`,
+    )
+    .join("");
+
+  return sendEmail({
+    to: contactInboxEmails(),
+    subject: `Nouveau message du site : ${params.subject}`,
+    html: layout(
+      "Nouveau message depuis le formulaire de contact",
+      `<table role="presentation" style="font-size:14px;margin-bottom:16px">${rows}</table>
+       <p style="white-space:pre-wrap;margin:0">${escapeHtml(params.message)}</p>`,
+    ),
+    text: `${params.name} <${params.email}>\n${params.subject}\n\n${params.message}`,
+    replyTo: params.email,
+  });
+}
