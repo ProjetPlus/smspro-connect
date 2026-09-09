@@ -94,6 +94,29 @@ function CampaignsPage() {
 
   return (
     <DashboardLayout title="Campagnes SMS">
+      {!accountState?.can_send && (
+        <div className="mb-4 rounded-sm border border-primary/40 bg-primary/5 p-4 text-sm">
+          <p className="font-semibold">Compte en cours de validation</p>
+          <p className="mt-1 text-foreground/70">
+            {accountState?.kyc_status === "none"
+              ? "Complétez votre dossier de vérification pour activer votre nom d'expéditeur."
+              : accountState?.paid
+                ? "Votre dossier et votre paiement sont bien reçus. L'administration valide votre compte sous peu."
+                : "Votre dossier est reçu. Achetez un pack pour faire valider votre demande."}
+          </p>
+          <div className="mt-3 flex gap-2">
+            {accountState?.kyc_status === "none" ? (
+              <Link to="/verification" className="px-3 py-1.5 rounded-sm bg-primary text-primary-foreground text-xs font-semibold">
+                Compléter la vérification
+              </Link>
+            ) : !accountState?.paid ? (
+              <Link to="/tarifs" className="px-3 py-1.5 rounded-sm bg-primary text-primary-foreground text-xs font-semibold">
+                Choisir un pack
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      )}
       <div className="flex justify-between items-center mb-4 flex-wrap gap-3">
         <div className="flex gap-1 flex-wrap items-center text-xs">
           {TABS.map((t) => (
@@ -118,6 +141,7 @@ function CampaignsPage() {
 
       {showForm && (
         <CampaignForm
+
           initial={editing}
           onDone={() => { setShowForm(false); setEditing(null); qc.invalidateQueries({ queryKey: ["campaigns"] }); }}
           onCancel={() => { setShowForm(false); setEditing(null); }}
