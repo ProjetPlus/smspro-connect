@@ -34,7 +34,28 @@ export const Route = createFileRoute("/api/public/v1/sms")({
         if (!parsed.success) return json({ error: parsed.error.message }, 400);
 
         const recipients = Array.isArray(parsed.data.to) ? parsed.data.to : [parsed.data.to];
-        const sender = parsed.data.sender_id ?? "SMSPRO";
+
+        // Même contrôle de conformité que l'envoi depuis le tableau de bord :
+        // dossier KYC approuvé obligatoire, et nom d'expéditeur figé sur celui validé.
+        const { data: application } = await supabaseAdmin
+          .from("signup_applications")
+          .select("status, sender_id")
+          .eq("user_id", apiKey.user_id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!application || application.status !== "approved") {
+          return json({ error: "Account not verified. Complete KYC validation before sending." }, 403);
+        }
+
+        const sender = (application.sender_id ?? "").trim();
+        if (!sender) {
+          return json({ error: "No approved sender ID on this account." }, 403);
+        }
+        if (parsed.data.sender_id && parsed.data.sender_id.trim() !== sender) {
+          return json({ error: "sender_id must match the approved sender ID." }, 403);
+        }
 
         // Check credits
         const { data: prof } = await supabaseAdmin.from("profiles")
