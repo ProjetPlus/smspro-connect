@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { SiteLayout, PageHero } from "@/components/site-chrome";
+import { LocationMap } from "@/components/location-map";
 import { submitContact } from "@/lib/contact.functions";
 import { track } from "@/lib/analytics";
 
@@ -260,6 +261,18 @@ function ContactPage() {
               </form>
             )}
           </div>
+        </div>
+      </section>
+
+      <section className="px-4 sm:px-8 pb-16 sm:pb-24">
+        <div className="mx-auto max-w-4xl">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-primary mb-2">
+            Nous trouver
+          </div>
+          <h2 className="font-display text-xl sm:text-2xl font-extrabold mb-4">
+            SMS Pro Mobile — Cocody Angré-Mahou
+          </h2>
+          <LocationMap />
         </div>
       </section>
     </SiteLayout>
