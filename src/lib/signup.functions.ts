@@ -327,3 +327,36 @@ export const deleteSignupApplication = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/**
+ * État du compte du client connecté : vérification téléphone, dossier KYC,
+ * paiement d'un pack et nom d'expéditeur autorisé.
+ */
+export const getMyAccountState = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("account_status, phone_verified_at, sms_credits")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    const { data: app } = await context.supabase
+      .from("signup_applications")
+      .select("id, status, sender_id, paid_at, created_at")
+      .eq("user_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const kyc_status = (app?.['status'] as string | undefined) ?? "none";
+    return {
+      account_status: (profile?.['account_status'] as string | undefined) ?? "pending_verification",
+      phone_verified: Boolean(profile?.['phone_verified_at']),
+      sms_credits: (profile?.['sms_credits'] as number | undefined) ?? 0,
+      kyc_status,
+      paid: Boolean(app?.['paid_at']),
+      sender_id: (app?.['sender_id'] as string | null | undefined) ?? null,
+      can_send: kyc_status === "approved",
+    };
+  });
