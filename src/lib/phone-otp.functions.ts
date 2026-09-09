@@ -77,8 +77,9 @@ export const sendPhoneOtp = createServerFn({ method: "POST" })
 
 /** Vérifie le code reçu et active le compte. */
 export const verifyPhoneOtp = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({ code: z.string().trim().regex(/^\d{6}$/) }).parse(data))
   .middleware([requireSupabaseAuth])
+  .inputValidator((data) => z.object({ code: z.string().trim().regex(/^\d{6}$/) }).parse(data))
+
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row } = await supabaseAdmin
