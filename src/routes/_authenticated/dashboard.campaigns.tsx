@@ -149,6 +149,8 @@ function CampaignsPage() {
         <CampaignForm
 
           initial={editing}
+          lockedSender={accountState?.can_send ? null : (accountState?.sender_id ?? "")}
+
           onDone={() => { setShowForm(false); setEditing(null); qc.invalidateQueries({ queryKey: ["campaigns"] }); }}
           onCancel={() => { setShowForm(false); setEditing(null); }}
         />
@@ -281,7 +283,7 @@ function ExecutionsTable({ rows }: { rows: any[] }) {
   );
 }
 
-function CampaignForm({ initial, onDone, onCancel }: { initial: any | null; onDone: () => void; onCancel: () => void }) {
+function CampaignForm({ initial, onDone, onCancel, lockedSender }: { initial: any | null; onDone: () => void; onCancel: () => void; lockedSender?: string | null }) {
   const [name, setName] = useState(initial?.name ?? "");
   const [sender, setSender] = useState(initial?.sender_id ?? "SMSPRO");
   const [message, setMessage] = useState(initial?.message ?? "");
@@ -339,7 +341,17 @@ function CampaignForm({ initial, onDone, onCancel }: { initial: any | null; onDo
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom de la campagne" className="px-3 py-2 border border-border rounded-sm text-sm sm:col-span-2" />
-        <input required value={sender} onChange={(e) => setSender(e.target.value)} maxLength={11} placeholder="Expéditeur (max 11 car.)" className="px-3 py-2 border border-border rounded-sm text-sm font-mono" />
+        <input
+          required
+          value={lockedSender != null ? (lockedSender || "En attente de validation") : sender}
+          onChange={(e) => setSender(e.target.value)}
+          disabled={lockedSender != null}
+          title={lockedSender != null ? "Votre nom d'expéditeur sera actif après validation de votre compte." : undefined}
+          maxLength={11}
+          placeholder="Expéditeur (max 11 car.)"
+          className="px-3 py-2 border border-border rounded-sm text-sm font-mono disabled:bg-muted disabled:text-foreground/40 disabled:cursor-not-allowed"
+        />
+
         <div className="text-xs text-foreground/50 self-center">Fuseau: Africa/Abidjan · {smsCount} SMS × destinataires</div>
         <div className="sm:col-span-2 flex flex-wrap items-center gap-2">
           <select
