@@ -164,9 +164,9 @@ function SignupPage() {
                     <PasswordField className={inp} value={f.password} onChange={(e) => set("password", e.target.value)} autoComplete="new-password" />
                   </Field>
                   <Field label="Contact *" full>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-stretch">
                       <select
-                        className={`${inp} w-auto shrink-0 pr-7`}
+                        className={`${inp.replace("w-full", "")} w-auto shrink-0 pr-8`}
                         value={f.dial_code}
                         onChange={(e) => set("dial_code", e.target.value)}
                         aria-label="Pays"
@@ -179,7 +179,7 @@ function SignupPage() {
                         ))}
                       </select>
                       <input
-                        className={inp}
+                        className={`${inp} flex-1 min-w-0`}
                         value={f.phone}
                         onChange={(e) => set("phone", e.target.value)}
                         inputMode="tel"
