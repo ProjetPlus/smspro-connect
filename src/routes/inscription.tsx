@@ -262,7 +262,7 @@ function SignupPage() {
             )}
           </div>
 
-          <p className="text-sm text-foreground/60 mt-6">
+          <p className="text-sm text-foreground/60 mt-6 text-center">
             Vous avez déjà un compte ? <Link to="/auth" className="text-primary font-semibold">Se connecter</Link>
           </p>
         </div>

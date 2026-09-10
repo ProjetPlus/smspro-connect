@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CookieConsentBanner } from "../components/cookie-consent";
 import { InstallPrompt } from "@/components/install-prompt";
+import { PatcoAssistant } from "@/components/patco-assistant";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -149,6 +150,7 @@ function RootComponent() {
       <Outlet />
       <CookieConsentBanner />
       <InstallPrompt />
+      <PatcoAssistant />
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );

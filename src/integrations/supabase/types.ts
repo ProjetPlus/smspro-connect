@@ -77,6 +77,134 @@ export type Database = {
         }
         Relationships: []
       }
+      assistant_knowledge: {
+        Row: {
+          active: boolean
+          category: string
+          content: string
+          created_at: string
+          id: string
+          source: string
+          title: string
+          updated_at: string
+          usage_count: number
+        }
+        Insert: {
+          active?: boolean
+          category?: string
+          content: string
+          created_at?: string
+          id?: string
+          source?: string
+          title: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          source?: string
+          title?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
+      assistant_leads: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          first_seen_at: string
+          full_name: string | null
+          id: string
+          interest: string | null
+          last_seen_at: string
+          message_count: number
+          notes: string | null
+          phone: string | null
+          session_id: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          first_seen_at?: string
+          full_name?: string | null
+          id?: string
+          interest?: string | null
+          last_seen_at?: string
+          message_count?: number
+          notes?: string | null
+          phone?: string | null
+          session_id: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          first_seen_at?: string
+          full_name?: string | null
+          id?: string
+          interest?: string | null
+          last_seen_at?: string
+          message_count?: number
+          notes?: string | null
+          phone?: string | null
+          session_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      assistant_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          lead_id: string | null
+          role: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          role: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_messages_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "assistant_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
