@@ -49,6 +49,7 @@ import { Route as AuthenticatedAdminNewsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminHeroRouteImport } from './routes/_authenticated/admin.hero'
 import { Route as AuthenticatedAdminContactsRouteImport } from './routes/_authenticated/admin.contacts'
 import { Route as AuthenticatedAdminCampaignsRouteImport } from './routes/_authenticated/admin.campaigns'
+import { Route as AuthenticatedAdminAssistantRouteImport } from './routes/_authenticated/admin.assistant'
 import { Route as ApiPublicWebhooksNtouchRouteImport } from './routes/api/public/webhooks/ntouch'
 import { Route as ApiPublicWebhooksNmgroupeRouteImport } from './routes/api/public/webhooks/nmgroupe'
 import { Route as ApiPublicWebhooksFedapayRouteImport } from './routes/api/public/webhooks/fedapay'
@@ -272,6 +273,12 @@ const AuthenticatedAdminCampaignsRoute =
     path: '/admin/campaigns',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminAssistantRoute =
+  AuthenticatedAdminAssistantRouteImport.update({
+    id: '/admin/assistant',
+    path: '/admin/assistant',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicWebhooksNtouchRoute = ApiPublicWebhooksNtouchRouteImport.update({
   id: '/api/public/webhooks/ntouch',
   path: '/api/public/webhooks/ntouch',
@@ -332,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/actualites/$slug': typeof ActualitesSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/~oauth/initiate': typeof Char126oauthInitiateRoute
+  '/admin/assistant': typeof AuthenticatedAdminAssistantRoute
   '/admin/campaigns': typeof AuthenticatedAdminCampaignsRoute
   '/admin/contacts': typeof AuthenticatedAdminContactsRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
@@ -380,6 +388,7 @@ export interface FileRoutesByTo {
   '/actualites/$slug': typeof ActualitesSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/~oauth/initiate': typeof Char126oauthInitiateRoute
+  '/admin/assistant': typeof AuthenticatedAdminAssistantRoute
   '/admin/campaigns': typeof AuthenticatedAdminCampaignsRoute
   '/admin/contacts': typeof AuthenticatedAdminContactsRoute
   '/admin/hero': typeof AuthenticatedAdminHeroRoute
@@ -430,6 +439,7 @@ export interface FileRoutesById {
   '/actualites/$slug': typeof ActualitesSlugRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/~oauth/initiate': typeof Char126oauthInitiateRoute
+  '/_authenticated/admin/assistant': typeof AuthenticatedAdminAssistantRoute
   '/_authenticated/admin/campaigns': typeof AuthenticatedAdminCampaignsRoute
   '/_authenticated/admin/contacts': typeof AuthenticatedAdminContactsRoute
   '/_authenticated/admin/hero': typeof AuthenticatedAdminHeroRoute
@@ -480,6 +490,7 @@ export interface FileRouteTypes {
     | '/actualites/$slug'
     | '/auth/callback'
     | '/~oauth/initiate'
+    | '/admin/assistant'
     | '/admin/campaigns'
     | '/admin/contacts'
     | '/admin/hero'
@@ -528,6 +539,7 @@ export interface FileRouteTypes {
     | '/actualites/$slug'
     | '/auth/callback'
     | '/~oauth/initiate'
+    | '/admin/assistant'
     | '/admin/campaigns'
     | '/admin/contacts'
     | '/admin/hero'
@@ -577,6 +589,7 @@ export interface FileRouteTypes {
     | '/actualites/$slug'
     | '/auth/callback'
     | '/~oauth/initiate'
+    | '/_authenticated/admin/assistant'
     | '/_authenticated/admin/campaigns'
     | '/_authenticated/admin/contacts'
     | '/_authenticated/admin/hero'
@@ -914,6 +927,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCampaignsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/assistant': {
+      id: '/_authenticated/admin/assistant'
+      path: '/admin/assistant'
+      fullPath: '/admin/assistant'
+      preLoaderRoute: typeof AuthenticatedAdminAssistantRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/webhooks/ntouch': {
       id: '/api/public/webhooks/ntouch'
       path: '/api/public/webhooks/ntouch'
@@ -968,6 +988,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
+  AuthenticatedAdminAssistantRoute: typeof AuthenticatedAdminAssistantRoute
   AuthenticatedAdminCampaignsRoute: typeof AuthenticatedAdminCampaignsRoute
   AuthenticatedAdminContactsRoute: typeof AuthenticatedAdminContactsRoute
   AuthenticatedAdminHeroRoute: typeof AuthenticatedAdminHeroRoute
@@ -992,6 +1013,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
+  AuthenticatedAdminAssistantRoute: AuthenticatedAdminAssistantRoute,
   AuthenticatedAdminCampaignsRoute: AuthenticatedAdminCampaignsRoute,
   AuthenticatedAdminContactsRoute: AuthenticatedAdminContactsRoute,
   AuthenticatedAdminHeroRoute: AuthenticatedAdminHeroRoute,
