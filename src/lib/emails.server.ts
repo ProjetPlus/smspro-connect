@@ -84,20 +84,22 @@ export function layout(title: string, bodyHtml: string, cta?: { label: string; h
   </td></tr></table></body></html>`;
 }
 
-export async function sendEmail(params: {
+type SendPayload = {
   to: string | string[];
   subject: string;
   html: string;
   text?: string;
   replyTo?: string;
-}): Promise<EmailResult> {
+};
+
+function normalizeRecipients(to: string | string[]): string[] {
+  return dedupe((Array.isArray(to) ? to : [to]).map((email) => email.trim()).filter(Boolean));
+}
+
+/** Envoi direct via Brevo, sans file d'attente. */
+async function deliver(recipients: string[], params: SendPayload): Promise<EmailResult> {
   const apiKey = process.env["BREVO_API_KEY"];
   if (!apiKey) return { sent: false, reason: "BREVO_API_KEY non configurée" };
-
-  const recipients = (Array.isArray(params.to) ? params.to : [params.to])
-    .map((email) => email.trim())
-    .filter(Boolean)
-    .map((email) => ({ email }));
   if (!recipients.length) return { sent: false, reason: "Aucun destinataire" };
 
   try {
@@ -110,7 +112,7 @@ export async function sendEmail(params: {
       },
       body: JSON.stringify({
         sender: sender(),
-        to: recipients,
+        to: recipients.map((email) => ({ email })),
         subject: params.subject,
         htmlContent: params.html,
         ...(params.text ? { textContent: params.text } : {}),
@@ -126,6 +128,118 @@ export async function sendEmail(params: {
     return { sent: false, reason: error instanceof Error ? error.message : "Erreur d'envoi" };
   }
 }
+
+/**
+ * Envoie un e-mail. Toute tentative est journalisée dans `email_outbox` :
+ * un échec (clé absente, panne Brevo) reste "pending" et sera renvoyé
+ * automatiquement par `flushPendingEmails()`.
+ */
+export async function sendEmail(params: SendPayload): Promise<EmailResult> {
+  const recipients = normalizeRecipients(params.to);
+  if (!recipients.length) return { sent: false, reason: "Aucun destinataire" };
+
+  const result = await deliver(recipients, params);
+
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("email_outbox").insert({
+      recipients,
+      subject: params.subject,
+      html: params.html,
+      text_body: params.text ?? null,
+      reply_to: params.replyTo ?? null,
+      status: result.sent ? "sent" : "pending",
+      attempts: 1,
+      last_error: result.sent ? null : (result.reason ?? null),
+      sent_at: result.sent ? new Date().toISOString() : null,
+    });
+  } catch (error) {
+    console.error("[emails] journalisation impossible", error);
+  }
+
+  return result;
+}
+
+/**
+ * Renvoie tous les e-mails restés en attente (file `email_outbox` +
+ * notifications administrateur non parties). Sans effet si Brevo n'est
+ * pas encore configuré.
+ */
+export async function flushPendingEmails(limit = 50): Promise<{ sent: number; failed: number }> {
+  if (!process.env["BREVO_API_KEY"]) return { sent: 0, failed: 0 };
+
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  let sent = 0;
+  let failed = 0;
+
+  const { data: queued } = await supabaseAdmin
+    .from("email_outbox")
+    .select("id, recipients, subject, html, text_body, reply_to, attempts")
+    .in("status", ["pending", "failed"])
+    .lt("attempts", 10)
+    .order("created_at", { ascending: true })
+    .limit(limit);
+
+  for (const row of queued ?? []) {
+    const result = await deliver(row.recipients ?? [], {
+      to: row.recipients ?? [],
+      subject: row.subject,
+      html: row.html,
+      ...(row.text_body ? { text: row.text_body } : {}),
+      ...(row.reply_to ? { replyTo: row.reply_to } : {}),
+    });
+    if (result.sent) sent += 1;
+    else failed += 1;
+    await supabaseAdmin
+      .from("email_outbox")
+      .update({
+        status: result.sent ? "sent" : "pending",
+        attempts: (row.attempts ?? 0) + 1,
+        last_error: result.sent ? null : (result.reason ?? null),
+        sent_at: result.sent ? new Date().toISOString() : null,
+      })
+      .eq("id", row.id);
+  }
+
+  // Anciennes notifications administrateur jamais envoyées par e-mail.
+  const { data: pendingNotifs } = await supabaseAdmin
+    .from("notifications")
+    .select("id, title, body, link, email_attempts")
+    .in("email_status", ["pending", "failed", "error"])
+    .lt("email_attempts", 10)
+    .order("created_at", { ascending: true })
+    .limit(limit);
+
+  for (const notif of pendingNotifs ?? []) {
+    const to = adminNotificationEmails();
+    const result = await deliver(to, {
+      to,
+      subject: notif.title,
+      html: layout(
+        notif.title,
+        `<p style="white-space:pre-wrap;margin:0">${escapeHtml(notif.body ?? "")}</p>`,
+        notif.link ? { label: "Ouvrir", href: `${appUrl()}${notif.link}` } : undefined,
+      ),
+      text: notif.body ?? notif.title,
+    });
+    if (result.sent) sent += 1;
+    else failed += 1;
+    await supabaseAdmin
+      .from("notifications")
+      .update({
+        email_status: result.sent ? "sent" : "failed",
+        email_error: result.sent ? null : (result.reason ?? null),
+        email_sent_at: result.sent ? new Date().toISOString() : null,
+        email_attempts: (notif.email_attempts ?? 0) + 1,
+        email_last_attempt_at: new Date().toISOString(),
+        email_to: to.join(", "),
+      })
+      .eq("id", notif.id);
+  }
+
+  return { sent, failed };
+}
+
 
 /* ------------------------------------------------------------------ */
 /* Modèles transactionnels                                             */
