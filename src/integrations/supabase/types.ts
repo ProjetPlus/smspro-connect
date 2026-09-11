@@ -1170,6 +1170,7 @@ export type Database = {
     }
     Functions: {
       autopublish_news: { Args: never; Returns: undefined }
+      is_privileged_actor: { Args: never; Returns: boolean }
       refund_sms_credits: {
         Args: { _amount: number; _user_id: string }
         Returns: number
