@@ -399,6 +399,51 @@ export type Database = {
         }
         Relationships: []
       }
+      email_outbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          html: string
+          id: string
+          last_error: string | null
+          recipients: string[]
+          reply_to: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          text_body: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          html: string
+          id?: string
+          last_error?: string | null
+          recipients: string[]
+          reply_to?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          text_body?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          html?: string
+          id?: string
+          last_error?: string | null
+          recipients?: string[]
+          reply_to?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          text_body?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           created_at: string
