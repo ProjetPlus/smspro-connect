@@ -157,7 +157,13 @@ export async function sendEmail(params: SendPayload): Promise<EmailResult> {
     console.error("[emails] journalisation impossible", error);
   }
 
+  // Profite de chaque envoi réussi pour vider la file des e-mails en attente.
+  if (result.sent) {
+    void flushPendingEmails().catch((error) => console.error("[emails] flush", error));
+  }
+
   return result;
+
 }
 
 /**
