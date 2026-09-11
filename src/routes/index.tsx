@@ -16,15 +16,15 @@ export const Route = createFileRoute("/")({
 
   head: () => ({
     meta: [
-      { title: "SMS Mobile Pro — Plateforme SMS Pro Mobile en Côte d'Ivoire" },
+      { title: "SMS Pro Mobile — Plateforme SMS professionnelle en Côte d'Ivoire" },
       {
         name: "description",
         content:
-          "SMS Mobile Pro : plateforme SMS pro mobile pour vos campagnes marketing, alertes et OTP en Côte d'Ivoire et CEDEAO. Mobile Money, API SMS, 98 % de livraison.",
+          "SMS Pro Mobile : plateforme SMS mobile pro pour vos campagnes marketing, alertes et OTP en Côte d'Ivoire et CEDEAO. Mobile Money, API SMS, 98 % de livraison.",
       },
       { name: "keywords", content: "SMS mobile pro, SMS pro mobile, SMS marketing Côte d'Ivoire, plateforme SMS CEDEAO, API SMS Abidjan" },
-      { property: "og:site_name", content: "SMS Mobile Pro" },
-      { property: "og:title", content: "SMS Mobile Pro — Plateforme SMS professionnelle en Côte d'Ivoire" },
+      { property: "og:site_name", content: "SMS Pro Mobile" },
+      { property: "og:title", content: "SMS Pro Mobile — Plateforme SMS professionnelle en Côte d'Ivoire" },
       {
         property: "og:description",
         content:
@@ -34,7 +34,8 @@ export const Route = createFileRoute("/")({
       { property: "og:url", content: "/" },
       { property: "og:locale", content: "fr_FR" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "SMS Mobile Pro — Plateforme SMS professionnelle" },
+      { name: "twitter:title", content: "SMS Pro Mobile — Plateforme SMS professionnelle" },
+
       {
         name: "twitter:description",
         content: "SMS marketing, alertes et API SMS en Côte d'Ivoire et CEDEAO. Paiement Mobile Money.",
