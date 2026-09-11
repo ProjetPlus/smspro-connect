@@ -23,12 +23,10 @@ export const Route = createFileRoute("/actualites/$slug")({
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
         { property: "og:type", content: "article" },
-        { property: "og:url", content: `https://smsmobilepro.lovable.app/actualites/${p.slug}` },
         { name: "twitter:card", content: p.cover_image_url ? "summary_large_image" : "summary" },
         { name: "twitter:title", content: p.title },
-        { name: "twitter:description", content: p.excerpt ?? p.title },
-        { name: "twitter:title", content: p.title },
         { name: "twitter:description", content: desc },
+
         ...(p.cover_image_url
           ? [
               { property: "og:image", content: p.cover_image_url },
