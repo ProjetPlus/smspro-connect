@@ -30,6 +30,7 @@ import { Route as ActualitesSlugRouteImport } from './routes/actualites.$slug'
 import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicEmailFlushRouteImport } from './routes/api/public/email-flush'
 import { Route as ActualitesTagSlugRouteImport } from './routes/actualites.tag.$slug'
 import { Route as ActualitesCategorieSlugRouteImport } from './routes/actualites.categorie.$slug'
 import { Route as AuthenticatedDashboardSettingsRouteImport } from './routes/_authenticated/dashboard.settings'
@@ -163,6 +164,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicEmailFlushRoute = ApiPublicEmailFlushRouteImport.update({
+  id: '/api/public/email-flush',
+  path: '/api/public/email-flush',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ActualitesTagSlugRoute = ActualitesTagSlugRouteImport.update({
   id: '/tag/$slug',
@@ -359,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/actualites/categorie/$slug': typeof ActualitesCategorieSlugRoute
   '/actualites/tag/$slug': typeof ActualitesTagSlugRoute
+  '/api/public/email-flush': typeof ApiPublicEmailFlushRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/checkout/$slug': typeof AuthenticatedDashboardCheckoutSlugRoute
@@ -408,6 +415,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/actualites/categorie/$slug': typeof ActualitesCategorieSlugRoute
   '/actualites/tag/$slug': typeof ActualitesTagSlugRoute
+  '/api/public/email-flush': typeof ApiPublicEmailFlushRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/checkout/$slug': typeof AuthenticatedDashboardCheckoutSlugRoute
@@ -459,6 +467,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/settings': typeof AuthenticatedDashboardSettingsRoute
   '/actualites/categorie/$slug': typeof ActualitesCategorieSlugRoute
   '/actualites/tag/$slug': typeof ActualitesTagSlugRoute
+  '/api/public/email-flush': typeof ApiPublicEmailFlushRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/checkout/$slug': typeof AuthenticatedDashboardCheckoutSlugRoute
@@ -510,6 +519,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/actualites/categorie/$slug'
     | '/actualites/tag/$slug'
+    | '/api/public/email-flush'
     | '/admin/'
     | '/dashboard/'
     | '/dashboard/checkout/$slug'
@@ -559,6 +569,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/actualites/categorie/$slug'
     | '/actualites/tag/$slug'
+    | '/api/public/email-flush'
     | '/admin'
     | '/dashboard'
     | '/dashboard/checkout/$slug'
@@ -609,6 +620,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/settings'
     | '/actualites/categorie/$slug'
     | '/actualites/tag/$slug'
+    | '/api/public/email-flush'
     | '/_authenticated/admin/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/checkout/$slug'
@@ -637,6 +649,7 @@ export interface RootRouteChildren {
   SolutionsRoute: typeof SolutionsRoute
   TarifsRoute: typeof TarifsRoute
   Char126oauthInitiateRoute: typeof Char126oauthInitiateRoute
+  ApiPublicEmailFlushRoute: typeof ApiPublicEmailFlushRoute
   ApiPublicHooksCampaignsCronRoute: typeof ApiPublicHooksCampaignsCronRoute
   ApiPublicV1SmsRoute: typeof ApiPublicV1SmsRoute
   ApiPublicWebhooksCinetpayRoute: typeof ApiPublicWebhooksCinetpayRoute
@@ -793,6 +806,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/email-flush': {
+      id: '/api/public/email-flush'
+      path: '/api/public/email-flush'
+      fullPath: '/api/public/email-flush'
+      preLoaderRoute: typeof ApiPublicEmailFlushRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/actualites/tag/$slug': {
       id: '/actualites/tag/$slug'
@@ -1083,6 +1103,7 @@ const rootRouteChildren: RootRouteChildren = {
   SolutionsRoute: SolutionsRoute,
   TarifsRoute: TarifsRoute,
   Char126oauthInitiateRoute: Char126oauthInitiateRoute,
+  ApiPublicEmailFlushRoute: ApiPublicEmailFlushRoute,
   ApiPublicHooksCampaignsCronRoute: ApiPublicHooksCampaignsCronRoute,
   ApiPublicV1SmsRoute: ApiPublicV1SmsRoute,
   ApiPublicWebhooksCinetpayRoute: ApiPublicWebhooksCinetpayRoute,
