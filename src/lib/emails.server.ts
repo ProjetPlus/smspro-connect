@@ -44,7 +44,7 @@ export function adminNotificationEmail(): string {
 }
 
 export function appUrl(): string {
-  return (process.env["APP_PUBLIC_URL"] ?? "https://smsmobilepro.lovable.app").replace(/\/+$/, "");
+  return (process.env["APP_PUBLIC_URL"] ?? "https://smsmobilepro.com").replace(/\/+$/, "");
 }
 
 function sender() {

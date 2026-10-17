@@ -26,9 +26,9 @@ export const Route = createFileRoute("/contact")({
           "Une question, un devis, un accès API ? Notre équipe basée en Côte d'Ivoire vous répond rapidement.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://smsmobilepro.lovable.app/contact" },
+      { property: "og:url", content: "https://smsmobilepro.com/contact" },
     ],
-    links: [{ rel: "canonical", href: "https://smsmobilepro.lovable.app/contact" }],
+    links: [{ rel: "canonical", href: "https://smsmobilepro.com/contact" }],
   }),
 });
 

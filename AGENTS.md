@@ -1,10 +1,6 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+# Repository instructions
+
+- Keep the `main` branch buildable and deployable.
+- Do not rewrite published Git history or force-push.
+- Keep secrets in server-side environment variables; never expose them in client code or commits.
+- Use the official public site domain `https://smsmobilepro.com` for canonical URLs, public links, and metadata.

@@ -89,7 +89,7 @@ function DevelopersPage() {
         <div className="mx-auto max-w-5xl">
           <h2 className="font-display font-extrabold text-2xl sm:text-3xl">Votre premier envoi</h2>
           <pre className="mt-5 overflow-x-auto bg-foreground text-background rounded-sm p-4 text-xs leading-relaxed">
-{`curl -X POST https://www.smsmobilepro.com/api/public/v1/sms \\
+{`curl -X POST https://smsmobilepro.com/api/public/v1/sms \\
   -H "Authorization: Bearer smspm_votre_cle" \\
   -H "Content-Type: application/json" \\
   -d '{

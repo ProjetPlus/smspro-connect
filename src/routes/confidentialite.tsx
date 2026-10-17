@@ -17,9 +17,9 @@ export const Route = createFileRoute("/confidentialite")({
         content: "Comment nous protégeons vos données personnelles et vos droits.",
       },
       { property: "og:type", content: "article" },
-      { property: "og:url", content: "https://smsmobilepro.lovable.app/confidentialite" },
+      { property: "og:url", content: "https://smsmobilepro.com/confidentialite" },
     ],
-    links: [{ rel: "canonical", href: "https://smsmobilepro.lovable.app/confidentialite" }],
+    links: [{ rel: "canonical", href: "https://smsmobilepro.com/confidentialite" }],
   }),
 });
 

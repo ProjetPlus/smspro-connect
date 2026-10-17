@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://smsmobilepro.lovable.app/sitemap.xml
+Sitemap: https://smsmobilepro.com/sitemap.xml

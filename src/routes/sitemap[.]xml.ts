@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getNewsSitemapEntries } from "@/lib/sitemap.server";
 
-const BASE_URL = "https://smsmobilepro.lovable.app";
+const BASE_URL = "https://smsmobilepro.com";
 
 interface SitemapEntry {
   path: string;

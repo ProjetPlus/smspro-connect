@@ -14,7 +14,7 @@ export const Route = createFileRoute("/actualites/categorie/$slug")({
     const name = (loaderData as any)?.category?.name ?? params.slug;
     const title = `Actualités — ${name} — SMS Pro Mobile`;
     const desc = `Articles catégorie ${name} sur SMS Pro Mobile.`;
-    const url = `https://smsmobilepro.lovable.app/actualites/categorie/${params.slug}`;
+    const url = `https://smsmobilepro.com/actualites/categorie/${params.slug}`;
     return {
       meta: [
         { title },
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/actualites/categorie/$slug")({
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
-        { property: "og:url", content: `https://smsmobilepro.lovable.app/actualites/categorie/${params.slug}` },
+        { property: "og:url", content: `https://smsmobilepro.com/actualites/categorie/${params.slug}` },
         { name: "twitter:card", content: "summary" },
         { name: "twitter:title", content: `Actualités — ${name}` },
         { name: "twitter:description", content: `Articles catégorie ${name} sur SMS Pro Mobile.` },
@@ -47,8 +47,8 @@ export const Route = createFileRoute("/actualites/categorie/$slug")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Accueil", item: "https://smsmobilepro.lovable.app/" },
-              { "@type": "ListItem", position: 2, name: "Actualités", item: "https://smsmobilepro.lovable.app/actualites" },
+              { "@type": "ListItem", position: 1, name: "Accueil", item: "https://smsmobilepro.com/" },
+              { "@type": "ListItem", position: 2, name: "Actualités", item: "https://smsmobilepro.com/actualites" },
               { "@type": "ListItem", position: 3, name: String(name), item: url },
             ],
           }),

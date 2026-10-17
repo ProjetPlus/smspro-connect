@@ -12,7 +12,7 @@ export const Route = createFileRoute("/actualites")({
   head: () => {
     const title = "Actualités — SMS Pro Mobile";
     const desc = "Toutes les actualités SMS Pro Mobile : nouveautés produit, retours clients et tendances du marketing SMS en Afrique de l'Ouest.";
-    const url = "https://smsmobilepro.lovable.app/actualites";
+    const url = "https://smsmobilepro.com/actualites";
     return {
       meta: [
         { title },
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/actualites")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Accueil", item: "https://smsmobilepro.lovable.app/" },
+              { "@type": "ListItem", position: 1, name: "Accueil", item: "https://smsmobilepro.com/" },
               { "@type": "ListItem", position: 2, name: "Actualités", item: url },
             ],
           }),

@@ -3,7 +3,7 @@
 // - Charge le script Plausible (sans cookies) uniquement si consentement analytics.
 import { trackEvent } from "./analytics.functions";
 
-const PLAUSIBLE_DOMAIN = "smsmobilepro.lovable.app";
+const PLAUSIBLE_DOMAIN = "smsmobilepro.com";
 const PLAUSIBLE_SRC = "https://plausible.io/js/script.js";
 const CONSENT_KEY = "sms_pro_cookie_consent_v1";
 

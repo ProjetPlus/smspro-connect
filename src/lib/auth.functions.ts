@@ -78,20 +78,13 @@ const RESET_PATH = "/reset-password";
 
 /**
  * Hôtes de première partie autorisés comme destination d'un email de récupération.
- * Liste stricte : aucun suffixe d'hébergement mutualisé (*.vercel.app, etc.),
- * qu'un tiers pourrait enregistrer pour capter le jeton de récupération.
+ * Liste stricte : seuls les domaines officiels de la plateforme sont autorisés.
  */
-const PROJECT_ID = "59b1ca94-6c4d-4eea-9803-50c3bc03f149";
 const ALLOWED_HOSTS = new Set([
   "localhost",
   "127.0.0.1",
   "smsmobilepro.com",
   "www.smsmobilepro.com",
-  `id-preview--${PROJECT_ID}.lovable.app`,
-  `preview--${PROJECT_ID}.lovable.app`,
-  `project--${PROJECT_ID}.lovable.app`,
-  `project--${PROJECT_ID}-dev.lovable.app`,
-  `${PROJECT_ID}.lovableproject.com`,
 ]);
 
 function isFirstPartyHost(hostname: string) {

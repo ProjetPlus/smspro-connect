@@ -25,14 +25,14 @@ export const Route = createFileRoute("/documentation")({
 const SNIPPETS: { lang: string; code: string }[] = [
   {
     lang: "cURL",
-    code: `curl -X POST https://www.smsmobilepro.com/api/public/v1/sms \\
+    code: `curl -X POST https://smsmobilepro.com/api/public/v1/sms \\
   -H "Authorization: Bearer smspm_votre_cle" \\
   -H "Content-Type: application/json" \\
   -d '{"to":["+2250700000000"],"message":"Bonjour","sender_id":"MASOCIETE"}'`,
   },
   {
     lang: "PHP",
-    code: `$ch = curl_init("https://www.smsmobilepro.com/api/public/v1/sms");
+    code: `$ch = curl_init("https://smsmobilepro.com/api/public/v1/sms");
 curl_setopt_array($ch, [
   CURLOPT_POST => true,
   CURLOPT_RETURNTRANSFER => true,
@@ -53,7 +53,7 @@ $response = curl_exec($ch);`,
     code: `import requests
 
 requests.post(
-    "https://www.smsmobilepro.com/api/public/v1/sms",
+    "https://smsmobilepro.com/api/public/v1/sms",
     headers={"Authorization": "Bearer smspm_votre_cle"},
     json={"to": ["+2250700000000"], "message": "Bonjour", "sender_id": "MASOCIETE"},
     timeout=30,
@@ -61,7 +61,7 @@ requests.post(
   },
   {
     lang: "Node.js",
-    code: `await fetch("https://www.smsmobilepro.com/api/public/v1/sms", {
+    code: `await fetch("https://smsmobilepro.com/api/public/v1/sms", {
   method: "POST",
   headers: {
     Authorization: "Bearer smspm_votre_cle",
@@ -77,7 +77,7 @@ requests.post(
   {
     lang: "Java",
     code: `HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://www.smsmobilepro.com/api/public/v1/sms"))
+    .uri(URI.create("https://smsmobilepro.com/api/public/v1/sms"))
     .header("Authorization", "Bearer smspm_votre_cle")
     .header("Content-Type", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString(
@@ -92,13 +92,13 @@ client.DefaultRequestHeaders.Add("Authorization", "Bearer smspm_votre_cle");
 var body = new StringContent(
     "{\\"to\\":[\\"+2250700000000\\"],\\"message\\":\\"Bonjour\\",\\"sender_id\\":\\"MASOCIETE\\"}",
     Encoding.UTF8, "application/json");
-await client.PostAsync("https://www.smsmobilepro.com/api/public/v1/sms", body);`,
+await client.PostAsync("https://smsmobilepro.com/api/public/v1/sms", body);`,
   },
   {
     lang: "WinDev",
     code: `req est un restRequête
 req.Méthode = httpPost
-req.URL = "https://www.smsmobilepro.com/api/public/v1/sms"
+req.URL = "https://smsmobilepro.com/api/public/v1/sms"
 req.Entête["Authorization"] = "Bearer smspm_votre_cle"
 req.Entête["Content-Type"] = "application/json"
 req.Contenu = '{"to":["+2250700000000"],"message":"Bonjour","sender_id":"MASOCIETE"}'

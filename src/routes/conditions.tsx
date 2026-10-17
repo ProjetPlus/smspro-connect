@@ -17,9 +17,9 @@ export const Route = createFileRoute("/conditions")({
         content: "Règles d'utilisation de la plateforme SMS Pro Mobile.",
       },
       { property: "og:type", content: "article" },
-      { property: "og:url", content: "https://smsmobilepro.lovable.app/conditions" },
+      { property: "og:url", content: "https://smsmobilepro.com/conditions" },
     ],
-    links: [{ rel: "canonical", href: "https://smsmobilepro.lovable.app/conditions" }],
+    links: [{ rel: "canonical", href: "https://smsmobilepro.com/conditions" }],
   }),
 });
 
