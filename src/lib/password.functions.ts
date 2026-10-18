@@ -9,7 +9,7 @@ import { z } from "zod";
  */
 export const updateMyPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) => z.object({ password: z.string().min(1).max(200) }).parse(data))
+  .validator((data) => z.object({ password: z.string().min(1).max(200) }).parse(data))
   .handler(async ({ data, context }) => {
     const { assertPasswordAllowed } = await import("./password.server");
     const policyError = await assertPasswordAllowed(data.password);
@@ -35,7 +35,7 @@ export const updateMyPassword = createServerFn({ method: "POST" })
  * itself is never transmitted or logged.
  */
 export const checkPasswordCompromised = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({ password: z.string().min(1).max(200) }).parse(data))
+  .validator((data) => z.object({ password: z.string().min(1).max(200) }).parse(data))
   .handler(async ({ data }) => {
     try {
       const bytes = new TextEncoder().encode(data.password);

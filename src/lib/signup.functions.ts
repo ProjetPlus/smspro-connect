@@ -5,7 +5,7 @@ import { assertAdminRole } from "./server-function-helpers";
 
 export const submitSignupApplication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) => z.object({
+  .validator((data) => z.object({
     email: z.string().trim().email().max(320),
     mobile: z.string().trim().min(6).max(30),
     civility: z.string().trim().max(20).optional().nullable(),
@@ -175,7 +175,7 @@ export const listSignupApplications = createServerFn({ method: "GET" })
 
 export const reviewSignupApplication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         id: z.string().uuid(),
@@ -320,7 +320,7 @@ export const reviewSignupApplication = createServerFn({ method: "POST" })
 
 export const deleteSignupApplication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { error } = await context.supabase.from("signup_applications").delete().eq("id", data.id);

@@ -16,7 +16,7 @@ export const listApiKeys = createServerFn({ method: "GET" })
 
 export const createApiKey = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ name: z.string().min(1).max(80) }).parse(d))
+  .validator((d) => z.object({ name: z.string().min(1).max(80) }).parse(d))
   .handler(async ({ data, context }) => {
     const raw = "smspm_" + randomBytes(24).toString("hex");
     const prefix = raw.slice(0, 12);
@@ -33,7 +33,7 @@ export const createApiKey = createServerFn({ method: "POST" })
 
 export const revokeApiKey = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("api_keys")
       .update({ revoked_at: new Date().toISOString() })

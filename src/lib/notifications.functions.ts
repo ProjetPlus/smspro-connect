@@ -19,7 +19,7 @@ export const listAdminNotifications = createServerFn({ method: "GET" })
 
 export const markNotificationRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), read: z.boolean() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid(), read: z.boolean() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { error } = await context.supabase
@@ -32,7 +32,7 @@ export const markNotificationRead = createServerFn({ method: "POST" })
 
 export const deleteNotification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { error } = await context.supabase.from("notifications").delete().eq("id", data.id);
@@ -46,7 +46,7 @@ export const deleteNotification = createServerFn({ method: "POST" })
  */
 export const retryNotificationEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
 

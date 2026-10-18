@@ -25,7 +25,7 @@ const tierSchema = z.object({
 
 export const upsertPricingTier = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => tierSchema.parse(d))
+  .validator((d: unknown) => tierSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     if (data.max_sms !== null && data.max_sms < data.min_sms) {
@@ -41,7 +41,7 @@ export const upsertPricingTier = createServerFn({ method: "POST" })
 
 export const deletePricingTier = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

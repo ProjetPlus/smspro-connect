@@ -17,7 +17,7 @@ export const listAssistantLeads = createServerFn({ method: "GET" })
 
 export const getAssistantConversation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { session_id: string }) => ({ session_id: String(input.session_id) }))
+  .validator((input: { session_id: string }) => ({ session_id: String(input.session_id) }))
   .handler(async ({ context, data }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -43,7 +43,7 @@ export const listAssistantKnowledge = createServerFn({ method: "GET" })
 
 export const upsertAssistantKnowledge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id?: string; title: string; content: string; category: string; active: boolean }) => input)
+  .validator((input: { id?: string; title: string; content: string; category: string; active: boolean }) => input)
   .handler(async ({ context, data }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -64,7 +64,7 @@ export const upsertAssistantKnowledge = createServerFn({ method: "POST" })
 
 export const deleteAssistantKnowledge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string }) => ({ id: String(input.id) }))
+  .validator((input: { id: string }) => ({ id: String(input.id) }))
   .handler(async ({ context, data }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

@@ -43,7 +43,7 @@ export const listUsers = createServerFn({ method: "GET" })
 
 export const updateUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; sms_credits?: number; full_name?: string; company?: string; phone?: string }) => d)
+  .validator((d: { id: string; sms_credits?: number; full_name?: string; company?: string; phone?: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -55,7 +55,7 @@ export const updateUser = createServerFn({ method: "POST" })
 
 export const setUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { user_id: string; role: "admin" | "client"; grant: boolean }) => d)
+  .validator((d: { user_id: string; role: "admin" | "client"; grant: boolean }) => d)
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -69,7 +69,7 @@ export const setUserRole = createServerFn({ method: "POST" })
 
 export const deleteUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     if (data.id === context.userId) throw new Error("Impossible de supprimer votre propre compte");
@@ -81,7 +81,7 @@ export const deleteUser = createServerFn({ method: "POST" })
 
 export const createUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { email: string; password: string; full_name?: string; role?: "admin" | "client"; sms_credits?: number }) =>
+  .validator((d: { email: string; password: string; full_name?: string; role?: "admin" | "client"; sms_credits?: number }) =>
     z.object({
       email: z.string().email(),
       password: z.string().min(8),
@@ -124,7 +124,7 @@ export const listPackagesAdmin = createServerFn({ method: "GET" })
 
 export const upsertPackage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: {
+  .validator((d: {
     id?: string; slug: string; name: string; price_fcfa: number; sms_volume: number;
     features: string[]; is_active?: boolean; featured?: boolean;
   }) => d)
@@ -144,7 +144,7 @@ export const upsertPackage = createServerFn({ method: "POST" })
 
 export const deletePackage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -165,7 +165,7 @@ export const listOrdersAdmin = createServerFn({ method: "GET" })
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; status: "pending" | "paid" | "failed" | "cancelled" }) => d)
+  .validator((d: { id: string; status: "pending" | "paid" | "failed" | "cancelled" }) => d)
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -199,7 +199,7 @@ export const listCampaignsAdmin = createServerFn({ method: "GET" })
 
 export const deleteCampaign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -220,7 +220,7 @@ export const listContacts = createServerFn({ method: "GET" })
 
 export const updateContactStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; status: string }) => d)
+  .validator((d: { id: string; status: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -231,7 +231,7 @@ export const updateContactStatus = createServerFn({ method: "POST" })
 
 export const deleteContact = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string }) => d)
+  .validator((d: { id: string }) => d)
   .handler(async ({ data, context }) => {
     await assertAdminRole(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

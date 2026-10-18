@@ -9,7 +9,7 @@ import { assertPasswordAllowed } from "./password.server";
  * confirmée ensuite par un code à 6 chiffres (voir phone-otp.functions).
  */
 export const createSignupAccount = createServerFn({ method: "POST" })
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         email: z.string().trim().email().max(320),

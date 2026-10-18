@@ -149,7 +149,7 @@ export const getCampaignsReport = createServerFn({ method: "GET" })
 
 export const sendTestSms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({
+  .validator((d) => z.object({
     recipients: z.array(z.string().min(6).max(20)).min(1).max(3),
     sender_id: z.string().min(1).max(11),
     message: z.string().min(1).max(1000),

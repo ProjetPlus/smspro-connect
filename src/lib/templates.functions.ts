@@ -16,7 +16,7 @@ export const listTemplates = createServerFn({ method: "GET" })
 
 export const upsertTemplate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z
       .object({
         id: z.string().uuid().optional(),
@@ -38,7 +38,7 @@ export const upsertTemplate = createServerFn({ method: "POST" })
 
 export const deleteTemplate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .validator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("sms_templates")

@@ -29,7 +29,7 @@ async function resolveEmail(identifier: string): Promise<string | null> {
  * Failures always return the same generic message (no account enumeration).
  */
 export const loginWithIdentifier = createServerFn({ method: "POST" })
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         identifier: z.string().trim().min(1).max(160),
@@ -121,7 +121,7 @@ function safeResetRedirect(value: string): string | null {
  * same response so callers cannot learn whether an account exists.
  */
 export const requestPasswordReset = createServerFn({ method: "POST" })
-  .inputValidator((data) =>
+  .validator((data) =>
     z
       .object({
         identifier: z.string().trim().min(1).max(160),

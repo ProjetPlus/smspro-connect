@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 /** Assistant public : aucune connexion requise. */
 export const askPatcoFn = createServerFn({ method: "POST" })
-  .inputValidator((input: { session_id: string; message: string }) => {
+  .validator((input: { session_id: string; message: string }) => {
     const session_id = String(input?.session_id ?? "").slice(0, 64);
     const message = String(input?.message ?? "").trim().slice(0, 1000);
     if (!session_id) throw new Error("Session invalide.");
@@ -69,7 +69,7 @@ export const askPatcoFn = createServerFn({ method: "POST" })
 
 /** Historique d'une session (pour reprendre la conversation au rechargement). */
 export const getPatcoHistory = createServerFn({ method: "POST" })
-  .inputValidator((input: { session_id: string }) => ({ session_id: String(input?.session_id ?? "").slice(0, 64) }))
+  .validator((input: { session_id: string }) => ({ session_id: String(input?.session_id ?? "").slice(0, 64) }))
   .handler(async ({ data }) => {
     if (!data.session_id) return { messages: [] as { role: string; content: string }[] };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

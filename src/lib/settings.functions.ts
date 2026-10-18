@@ -11,7 +11,7 @@ export const getMockMode = createServerFn({ method: "GET" })
 
 export const setMockMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data) => z.object({ sms: z.boolean(), payments: z.boolean() }).parse(data))
+  .validator((data) => z.object({ sms: z.boolean(), payments: z.boolean() }).parse(data))
   .handler(async ({ data, context }) => {
     const { data: roles } = await context.supabase
       .from("user_roles")
