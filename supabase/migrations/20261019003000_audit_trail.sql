@@ -57,7 +57,10 @@ BEGIN
   INSERT INTO public.audit_logs(actor_id, action, resource, resource_id, changed_fields)
   VALUES (auth.uid(), TG_OP, TG_TABLE_NAME, rid, COALESCE(changed, '{}'));
 
-  RETURN CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
+  RETURN NEW;
 END;
 $$;
 
