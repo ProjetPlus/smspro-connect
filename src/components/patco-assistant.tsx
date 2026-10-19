@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Send } from "lucide-react";
 import { askPatcoFn, getPatcoHistory } from "@/lib/patco.functions";
-import patcoAvatar from "@/assets/sms-pro-mobile-logo.png";
+import patcoAvatar from "@/assets/patco-avatar.jpg";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
