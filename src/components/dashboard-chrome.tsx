@@ -18,6 +18,7 @@ const NAV: NavItem[] = [
   { to: "/dashboard/api-keys", label: "Clés API" },
   { to: "/dashboard/settings", label: "Paramètres" },
   { to: "/admin", label: "— Admin —", admin: true },
+  { to: "/admin/audit", label: "Journal d’audit", admin: true },
   { to: "/admin/users", label: "Utilisateurs", admin: true },
   { to: "/admin/packages", label: "Packages", admin: true },
   { to: "/admin/pricing", label: "Paliers tarifaires", admin: true },
