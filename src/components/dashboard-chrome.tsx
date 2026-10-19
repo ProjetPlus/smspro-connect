@@ -12,6 +12,7 @@ const NAV: NavItem[] = [
   { to: "/dashboard", label: "Vue d'ensemble" },
   { to: "/verification", label: "Vérification (KYC)" },
   { to: "/dashboard/campaigns", label: "Campagnes" },
+  { to: "/dashboard/templates", label: "Modèles SMS" },
 
   { to: "/dashboard/orders", label: "Commandes" },
   { to: "/dashboard/api-keys", label: "Clés API" },
