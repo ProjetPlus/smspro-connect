@@ -34,7 +34,7 @@ function TemplatesPage() {
   const filtered = useMemo(() => data.filter((item) => [item.name, item.category, item.content].some((v) => v.toLowerCase().includes(query.toLowerCase()))), [data, query]);
   const stats = estimateSms(editing.content);
   const save = useMutation({
-    mutationFn: () => upsertTemplate(editing),
+    mutationFn: () => upsertTemplate({ data: editing }),
     onSuccess: async () => {
       toast.success(editing.id ? "Modèle mis à jour" : "Modèle enregistré");
       setEditing(EMPTY);
