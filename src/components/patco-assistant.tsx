@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Send } from "lucide-react";
 import { askPatcoFn, getPatcoHistory } from "@/lib/patco.functions";
-import patcoAvatar from "@/assets/patco-avatar.png.asset.json";
+import patcoAvatar from "@/assets/sms-pro-mobile-logo.png";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -74,9 +74,9 @@ export function PatcoAssistant() {
           className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-background/95 backdrop-blur border border-border shadow-lg pl-1.5 pr-4 py-1.5 hover:border-primary transition-colors"
         >
           <img
-            src={patcoAvatar.url}
+            src={patcoAvatar}
             alt="Patco, assistante virtuelle SMS Pro Mobile"
-            className="h-11 w-11 rounded-full object-cover ring-2 ring-primary"
+            className="h-11 w-11 rounded-full object-contain bg-white p-1 ring-2 ring-primary"
           />
           <span className="text-left leading-tight">
             <span className="block text-sm font-bold">Patco</span>
@@ -91,7 +91,7 @@ export function PatcoAssistant() {
       {open && (
         <div className="fixed bottom-5 right-5 z-50 w-[min(24rem,calc(100vw-2.5rem))] h-[min(32rem,calc(100vh-6rem))] flex flex-col rounded-lg border border-border bg-background shadow-2xl overflow-hidden">
           <header className="flex items-center gap-3 p-3 border-b border-border bg-muted">
-            <img src={patcoAvatar.url} alt="" className="h-9 w-9 rounded-full object-cover ring-2 ring-primary" />
+            <img src={patcoAvatar} alt="" className="h-9 w-9 rounded-full object-contain bg-white p-1 ring-2 ring-primary" />
             <div className="flex-1 leading-tight">
               <div className="text-sm font-bold">Patco</div>
               <div className="text-[10px] font-mono uppercase tracking-wider text-foreground/50">
@@ -107,7 +107,7 @@ export function PatcoAssistant() {
             {messages.map((m, i) => (
               <div key={i} className={m.role === "user" ? "flex justify-end" : "flex gap-2"}>
                 {m.role === "assistant" && (
-                  <img src={patcoAvatar.url} alt="" className="h-6 w-6 rounded-full object-cover mt-0.5 shrink-0" />
+                  <img src={patcoAvatar} alt="" className="h-6 w-6 rounded-full object-contain bg-white p-0.5 mt-0.5 shrink-0" />
                 )}
                 <div
                   className={
